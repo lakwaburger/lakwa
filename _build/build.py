@@ -190,7 +190,7 @@ def page_home():
          body, js=("home",))
 
 def page_order():
-    body = """<main id="main" class="page page--cream"><div class="container">
+    body = f"""<main id="main" class="page page--cream"><div class="container">
 <div class="page-head"><p class="eyebrow">Order online</p><h1 class="display display--lg">Build your order</h1>
 <p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Earth Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
 <div class="order-layout">

@@ -22,6 +22,22 @@ function htmlToText(html: string) {
     .trim();
 }
 
+// Encode non-ASCII subjects ourselves (RFC 2047, UTF-8 base64) so "—", "ñ" etc. don't show up garbled.
+// Split into chunks of whole characters so each encoded word stays under the 75-char limit.
+function encodeSubject(s: string) {
+  if (/^[\x00-\x7F]*$/.test(s)) return s;
+  const enc = new TextEncoder(), words: string[] = [];
+  let chunk: number[] = [];
+  const flush = () => { if (chunk.length) { words.push("=?UTF-8?B?" + btoa(String.fromCharCode(...chunk)) + "?="); chunk = []; } };
+  for (const ch of s) {
+    const bytes = enc.encode(ch);
+    if (chunk.length + bytes.length > 42) flush();
+    chunk.push(...bytes);
+  }
+  flush();
+  return words.join(" ");
+}
+
 let transport: ReturnType<typeof nodemailer.createTransport> | null = null;
 function smtp() {
   if (!transport) {
@@ -55,7 +71,7 @@ Deno.serve(async (req) => {
       from: `${env("EMAIL_FROM_NAME", "Lakwa Burger Cafe")} <${user}>`,
       replyTo: user,
       to,
-      subject,
+      subject: encodeSubject(subject),
       html,
       text: htmlToText(html),
     });

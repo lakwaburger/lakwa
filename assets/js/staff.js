@@ -55,7 +55,7 @@
     refreshBadge();
     window.scrollTo(0, 0);
     if (h.indexOf("order=") === 0) return orderDetail(h.slice(6));
-    if (h.indexOf("payments") === 0) return payments(decodeURIComponent((h.split("=")[1] || "")));
+    if (h.indexOf("payments") === 0) return payments();
     if (h === "community" || h === "customers") return customers();
     if (h === "menu" && me.role === "admin") return menu();
     if (h === "settings" && me.role === "admin") return settings();
@@ -115,30 +115,19 @@
   // ------------------------------------------------------------ payments helpers
   function enrich(pays) {
     if (!pays.length) return Promise.resolve([]);
-    var refs = pays.map(function (p) { return p.gcash_ref; });
-    return Promise.all([
-      sb.from("payments").select("id, order_id, gcash_ref").in("gcash_ref", refs).neq("status", "rejected"),
-      sb.storage.from("payment-proofs").createSignedUrls(pays.map(function (p) { return p.proof_path; }), 900)
-    ]).then(function (r) {
-      var same = r[0].data || [], urls = r[1].data || [];
-      return pays.map(function (p, i) {
-        p.url = urls[i] && urls[i].signedUrl;
-        p.duplicate = same.some(function (s) { return s.gcash_ref === p.gcash_ref && s.order_id !== p.order_id; });
-        return p;
-      });
+    return sb.storage.from("payment-proofs").createSignedUrls(pays.map(function (p) { return p.proof_path; }), 900).then(function (r) {
+      var urls = r.data || [];
+      return pays.map(function (p, i) { p.url = urls[i] && urls[i].signedUrl; return p; });
     });
   }
   function paymentHtml(p, total) {
-    var amountOk = Math.abs(Number(p.amount) - Number(total)) < 0.01, refOk = /^\d{13}$/.test(p.gcash_ref);
     return '<div class="pay-review"><div class="pay-proof">' +
       (p.url ? (/\.pdf$/i.test(p.proof_path) ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">Open PDF receipt</a>'
         : '<a href="' + esc(p.url) + '" target="_blank" rel="noopener"><img src="' + esc(p.url) + '" alt="GCash receipt"></a>') : '<span class="muted small">No preview</span>') +
-      '</div><div class="pay-info"><p class="ref">Ref <b>' + esc(p.gcash_ref.replace(/(\d{4})(\d{3})(\d{6})/, "$1 $2 $3")) + '</b></p><ul class="checks">' +
-      '<li class="' + (refOk ? "ok" : "bad") + '">' + (refOk ? "✓" : "✗") + " 13-digit reference</li>" +
-      '<li class="' + (amountOk ? "ok" : "bad") + '">' + (amountOk ? "✓" : "✗") + " Amount " + peso(p.amount) + (amountOk ? " matches" : " ≠ order total " + peso(total)) + "</li>" +
-      '<li class="' + (p.duplicate ? "bad" : "ok") + '">' + (p.duplicate ? "✗ Reference used on another order" : "✓ Reference not used elsewhere") + "</li></ul>" +
-      '<p class="muted small">' + (p.sender_name ? "From " + esc(p.sender_name) + " " : "") + (p.sender_number ? "(" + esc(p.sender_number) + ") " : "") + "· " + L.when(p.created_at) + "</p>" +
-      '<p class="muted small">Confirm the same reference no. and amount appear in the cafe\'s GCash transaction history before verifying.</p>' +
+      '</div><div class="pay-info"><p class="ref">Order total <b>' + peso(total) + "</b></p>" +
+      (p.gcash_ref ? '<p class="muted small">Ref ' + esc(p.gcash_ref) + "</p>" : "") +
+      '<p class="muted small">Uploaded ' + L.when(p.created_at) + "</p>" +
+      '<p class="muted small">Check the cafe\'s GCash history shows ' + peso(total) + " received before verifying.</p>" +
       (p.status === "submitted"
         ? '<form class="review-form" data-review="' + p.id + '"><input name="note" placeholder="Note to customer (shown if rejected)"><div class="btn-row">' +
           '<button name="d" value="verify" class="btn btn--teal">Verify payment</button><button name="d" value="reject" class="btn btn--outline-dark">Reject</button></div></form>'
@@ -193,30 +182,21 @@
     });
   }
 
-  // ------------------------------------------------------------ payments (match a GCash ref)
-  function payments(ref) {
+  // ------------------------------------------------------------ payments (screenshots waiting for review)
+  function payments() {
     loading();
-    var digits = String(ref || "").replace(/\D/g, "");
-    var q = sb.from("payments").select("*, orders(order_no, total, customer_name, status)");
-    q = digits ? q.like("gcash_ref", "%" + digits + "%").order("created_at", { ascending: false }).limit(20)
-      : q.eq("status", "submitted").order("created_at", { ascending: true }).limit(50);
-    q.then(function (r) {
+    sb.from("payments").select("*, orders(order_no, total, customer_name, status)")
+      .eq("status", "submitted").order("created_at", { ascending: true }).limit(50).then(function (r) {
       if (r.error) return fail(r.error);
       enrich(r.data).then(function (pays) {
-        view.innerHTML = '<div class="staff-head"><h1>Payments</h1></div><form class="filters card" data-ref><label class="grow">Match a GCash reference no.' +
-          '<input name="ref" value="' + esc(ref || "") + '" inputmode="numeric" placeholder="Paste the ref no. from the cafe\'s GCash history" autofocus></label>' +
-          '<button class="btn btn--teal">Find</button>' + (digits ? '<a href="#payments">Show all pending</a>' : "") + "</form>" +
-          '<h2 class="sub">' + (digits ? "Results for “" + esc(digits) + "”" : "Waiting for review (" + pays.length + ")") + "</h2>" +
-          (digits && !pays.length ? '<div class="notice notice--warn">No customer has uploaded a payment with that reference number.</div>' : "") +
-          (!digits && !pays.length ? '<p class="muted">All caught up — no payments waiting.</p>' : "") +
+        view.innerHTML = '<div class="staff-head"><h1>Payments</h1></div>' +
+          '<h2 class="sub">Waiting for review (' + pays.length + ")</h2>" +
+          (!pays.length ? '<p class="muted">All caught up — no payments waiting.</p>' : "") +
           pays.map(function (p) {
             return '<section class="card"><h3 class="card-title"><a href="#order=' + p.order_id + '">' + esc(p.orders.order_no) + "</a> · " + esc(p.orders.customer_name) + " " +
               pill(p.orders.status) + "</h3>" + paymentHtml(p, p.orders.total) + "</section>";
           }).join("");
-        $("[data-ref]", view).addEventListener("submit", function (e) {
-          e.preventDefault(); location.hash = "payments=" + encodeURIComponent(e.target.ref.value.replace(/\D/g, ""));
-        });
-        bindReviews(function () { payments(ref); });
+        bindReviews(payments);
       });
     });
   }

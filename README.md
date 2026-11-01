@@ -35,11 +35,10 @@ Generated pages are committed. After editing `_build/build.py`, run the build an
 
 ## Ordering & GCash
 1. Customer orders → gets an order page link (also emailed).
-2. Pays the exact total by GCash, uploads the receipt screenshot + 13-digit reference no.
+2. Pays the whole total by GCash and uploads a screenshot of the receipt (nothing else to fill in).
    Uploads go to the private `payment-proofs` bucket, only into that order's own folder.
-3. Staff → **Payments**: paste the reference no. from the cafe's GCash history → see the matching order with checks
-   (13 digits ✓, amount = total ✓, ref not used on another order ✓) and the screenshot → **Verify** or **Reject**.
-   The customer is emailed either way. The same reference can never be accepted twice.
+3. Staff → **Payments**: each waiting screenshot with its order total → check the cafe's GCash history shows
+   that amount received → **Verify** or **Reject**. The customer is emailed either way.
 4. Staff moves the order: Paid → Preparing → Ready → Completed. Orders tab = full history (filters, search, dates).
 
 ## Data / security

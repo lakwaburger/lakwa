@@ -1,67 +1,78 @@
-# Lakwa Burger Cafe
+# Lakwa Burger Cafe — website
 
-Standalone ordering site for the Lakwa Burger Cafe (El Nido, Palawan), rebuilt from
-<https://lakwamotorcycles.com/burger-cafe>. Next.js 16 (App Router) + Supabase.
+Static site (HTML/CSS/JS) on GitHub Pages + Supabase (project **lakwa**, ref `hwkydsigfcgbyiyukzbr`, account migquesada).
+Rebuilt from https://lakwamotorcycles.com/burger-cafe. Live at https://migquesada.github.io/lakwa/
 
-## What it does
+## Structure
+```
+_build/build.py       Page templates + facts (address, phone, menu fallback, BASE path). Run: python3 _build/build.py
+index.html            Homepage (menu prices load live from Supabase)
+order/                Cart + checkout (guest or registered customer)
+order/view/           Order receipt / tracker + GCash receipt upload  (?id=…&t=…)
+orders/               Order history for Earth Community members (email + passcode)
+community/            Request to join The Earth Community (staff approve → passcode emailed)
+staff/                Staff dashboard (email + password login)
+assets/               css/site.css, js/config.js (publishable key), js/*.js
+supabase/migrations/  Database schema + functions (run in order in the SQL Editor)
+supabase/seed.sql     Starting menu
+```
+Generated pages are committed. After editing `_build/build.py`, run the build and upload the changed files.
 
-| Who | Page | What |
-|---|---|---|
-| Public | `/` | Homepage (replica of the Squarespace page) with live menu prices |
-| Public | `/order` | Cart + checkout. Guests pay the public price. Registered customers tick “I'm a registered customer”, enter email + passcode, and their member price is applied automatically. |
-| Public | `/order/[id]?t=…` | Order receipt/tracker + GCash payment: pay, then upload receipt screenshot + 13-digit reference no. |
-| Members | `/orders` | Order history (email + passcode) |
-| Staff | `/staff` | Orders by status, search, date range — full order history |
-| Staff | `/staff/orders/[id]` | Order detail, verify/reject GCash payment, move order through Paid → Preparing → Ready → Completed |
-| Staff | `/staff/payments` | Paste a GCash reference no. from the cafe's GCash history to find the matching order; queue of payments to check |
-| Staff | `/staff/customers` | Register customers (6-digit passcode is generated and emailed), new passcode, disable, unlock, extra discount % |
-| Admin | `/staff/menu` | Base prices, items, availability |
-| Admin | `/staff/settings` | Price increase %, GCash name/number/QR, open/close online ordering |
+## Pricing
+- Each menu item has a **base price** = the price before the increase (what registered customers pay).
+  Cheese ₱249 is real; Bacon Cheese ₱289, Crispy Chicken ₱269, Mozzarella Fingers ₱189 are stand-ins — edit in Staff → Menu & prices.
+- **Public price** = base + 20% (Staff → Settings), rounded up to the peso: ₱249 → ₱299.
+- **Registered customers** tick "I'm a registered customer" at checkout and enter email + passcode → they pay the base price
+  (optionally an extra % off, set per customer).
+- Totals are always calculated in the database (`place_order`), never trusted from the browser.
 
-### Pricing
+## The Earth Community (members)
+- Guests request to join at `/community/` (name, email, mobile, optional note). They get a "we got your request" email;
+  `staff_notify_email` (private.secrets, default migquesada@gmail.com) gets an alert.
+- Staff → **Earth Community** → Requests: **Approve** (optional extra %) creates the member, generates a 6-digit passcode
+  and emails it; **Decline** emails a polite note. Staff can also add members directly.
+- Members tick "I'm an Earth Community member" at checkout → original (pre-increase) prices.
 
-- **Base price** = the price before the increase (Cheese ₱249 is real; Bacon Cheese ₱289, Crispy Chicken ₱269, Mozzarella Fingers ₱189 are stand-ins — change them in `/staff/menu`).
-- **Public price** = base + 20%, rounded up to the peso (₱249 → ₱299).
-- **Registered customers** pay the base price, so they don't feel the increase. Staff can give an individual an extra % off.
-- Prices are always recalculated on the server; the browser can't change them.
+## Ordering & GCash
+1. Customer orders → gets an order page link (also emailed).
+2. Pays the exact total by GCash, uploads the receipt screenshot + 13-digit reference no.
+   Uploads go to the private `payment-proofs` bucket, only into that order's own folder.
+3. Staff → **Payments**: paste the reference no. from the cafe's GCash history → see the matching order with checks
+   (13 digits ✓, amount = total ✓, ref not used on another order ✓) and the screenshot → **Verify** or **Reject**.
+   The customer is emailed either way. The same reference can never be accepted twice.
+4. Staff moves the order: Paid → Preparing → Ready → Completed. Orders tab = full history (filters, search, dates).
 
-### GCash payment matching
+## Data / security
+Visitors only read the menu + settings and call validated database functions:
+`check_member`, `place_order`, `get_order`, `submit_payment`, `lookup_orders`, `request_membership`.
+Staff (rows in `staff`, Supabase Auth email + password) read/update orders, payments and customers through RLS, and call
+`create_customer`, `reset_passcode`, `review_payment`, `approve_membership`, `decline_membership`. Admins also edit the menu and settings. Passcode hashes are never readable.
+Customer passcodes: 6 digits, bcrypt-hashed, 5 wrong tries = 15-minute lock (staff can unlock).
 
-1. Customer sends the exact total via GCash and uploads the receipt + reference no.
-2. The site rejects a reference that's not 13 digits or already used on another order (also enforced by a unique index).
-3. Staff opens `/staff/payments`, pastes the ref no. from the cafe's GCash transaction history, and sees the order with checks: ✓ 13 digits, ✓ amount = order total, ✓ not used elsewhere, plus the screenshot.
-4. **Verify** → order becomes *Paid* and the customer is emailed. **Reject** → customer is emailed and can re-upload.
+Staff: Nanni (nanni@staff.local) and Miguel (miguel@staff.local), both admin. Add more:
+```sql
+insert into public.staff (user_id, full_name, role)
+select id, 'Name', 'staff' from auth.users where email = 'name@staff.local';
+```
 
-Receipts are stored in a private Supabase Storage bucket and only shown to staff through short-lived links.
+## Email (Gmail, for testing)
+Emails (passcodes, order received, payment confirmed/rejected) are queued by the database (`pg_net`) to the
+Edge Function `send-email` (`supabase/functions/send-email/index.ts`), which sends through Gmail SMTP as
+**migquesada@gmail.com**. Gmail allows ~500 emails/day — fine for testing; move to a domain sender before launch.
+Until email is switched on, staff see each new passcode on screen to share themselves.
 
-## Setup
+To switch on:
+1. Google Account → Security → 2-Step Verification (on) → **App passwords** → create one ("Lakwa").
+2. Supabase → Edge Functions → create `send-email`, paste the code, **Verify JWT off**, Deploy.
+3. Edge Functions → Secrets: `GMAIL_USER` = migquesada@gmail.com, `GMAIL_APP_PASSWORD` = the app password,
+   `EMAIL_HOOK_SECRET` = result of `select value from private.secrets where key = 'email_hook_secret';`
+4. SQL Editor: `insert into private.secrets values ('email_enabled','true') on conflict (key) do update set value = 'true';`
 
-1. **Supabase** → create a project, then in **SQL Editor** run, in order:
-   - `supabase/migrations/20261101000000_init.sql`
-   - `supabase/seed.sql`
-2. **First staff/admin account**: Supabase → Authentication → Users → *Add user* (email + password, auto-confirm). Then in SQL Editor:
-   ```sql
-   insert into public.staff (user_id, full_name, role)
-   select id, 'Your Name', 'admin' from auth.users where email = 'you@example.com';
-   ```
-   Add more staff the same way with `role = 'staff'` (staff can't edit menu/settings).
-3. **Email** (for passcodes + order emails): create a free [Resend](https://resend.com) account, verify your domain, set `RESEND_API_KEY` and `EMAIL_FROM`. Until then, staff see each new passcode on screen to share manually.
-4. Copy `.env.example` → `.env.local` and fill in the values.
-5. `npm install && npm run dev` → <http://localhost:3000>, staff at `/staff`.
-6. Set your GCash name/number (and QR image URL) in `/staff/settings`.
+## Deploying changes
+Claude prepares `~/Sites/lakwa-upload-N` (same paths as the repo) → upload to GitHub (Add file → Upload files).
+SQL: Claude loads it into the Supabase SQL Editor → you click **Run**.
 
-### Deploy (Vercel)
-
-Import the GitHub repo in Vercel, add the same env vars (set `SITE_URL` to the live URL), deploy.
-
-## Security notes
-
-- The anon key can only read the menu and settings (RLS). Customers, orders and payments are only reachable from the server with the service-role key — keep `SUPABASE_SERVICE_ROLE_KEY` out of the browser and out of git.
-- Passcodes are stored as bcrypt hashes; 5 wrong tries lock that customer for 15 minutes (staff can unlock).
-- Emailing passcodes in plain text is convenient but means anyone with access to that inbox can use it. Staff can issue a new passcode anytime.
-
-## Merging into lakwamotorcycles.com later
-
-- Set `basePath: "/burger-cafe"` in `next.config.ts`, or move the routes under `app/burger-cafe/` in the main site.
-- In `lib/site.ts`, set `MAIN_SITE = ""` so nav links become internal.
-- Images still load from the Squarespace CDN; move them to `public/` or Supabase Storage before leaving Squarespace.
+## Going live on a domain / merging into lakwamotorcycles.com
+1. In `_build/build.py` set `BASE` (e.g. `""` for its own domain), and `base` in `assets/js/config.js`; rebuild.
+2. Update `site_url` in `private.secrets` so email links point to the new address.
+3. Images still load from the Squarespace CDN; move them into `assets/img/` before leaving Squarespace.

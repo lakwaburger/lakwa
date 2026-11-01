@@ -1,0 +1,145 @@
+/* /order/ — cart + checkout. Prices shown here are a preview; place_order() in the database decides the real total. */
+(function () {
+  "use strict";
+  var CART_KEY = "lakwa-cart";
+  var form = L.$("[data-checkout]");
+  var menuEl = L.$("[data-menu]");
+  var state = { items: [], markup: 20, accepting: true, cart: {}, member: null };
+
+  try { state.cart = JSON.parse(localStorage.getItem(CART_KEY) || "{}") || {}; } catch (e) { state.cart = {}; }
+  function save() { try { localStorage.setItem(CART_KEY, JSON.stringify(state.cart)); } catch (e) {} }
+
+  function pub(m) { return L.publicPrice(m.base_price, state.markup); }
+  function charged(m) { return state.member && state.member.prices[m.id] != null ? Number(state.member.prices[m.id]) : pub(m); }
+  function lines() { return state.items.filter(function (m) { return state.cart[m.id] > 0; }).map(function (m) { return { m: m, qty: state.cart[m.id] }; }); }
+
+  function renderMenu() {
+    menuEl.innerHTML = state.items.map(function (m) {
+      var q = state.cart[m.id] || 0, p = pub(m), c = charged(m);
+      var price = c < p ? "<s>" + L.peso(p) + '</s> <span class="member-price">' + L.peso(c) + "</span>" : L.peso(p);
+      var ctrl = q > 0
+        ? '<button type="button" data-dec="' + m.id + '" aria-label="Remove one ' + L.esc(m.name) + '">−</button><span>' + q +
+          '</span><button type="button" data-inc="' + m.id + '" aria-label="Add one ' + L.esc(m.name) + '">+</button>'
+        : '<button type="button" class="qty-add" data-inc="' + m.id + '">Add</button>';
+      return '<li class="order-item"><div class="order-item-img">' +
+        (m.image_url ? '<img src="' + L.esc(L.sized(m.image_url, 300)) + '" alt="" loading="lazy">' : "") +
+        '</div><div class="order-item-body"><h3>' + L.esc(m.name) + '</h3><p class="order-item-desc">' + L.esc(m.description) +
+        '</p><p class="order-item-price">' + price + '</p></div><div class="qty">' + ctrl + "</div></li>";
+    }).join("") || '<li class="muted">The menu is empty right now.</li>';
+  }
+
+  function renderCart() {
+    var ls = lines(), count = 0, sub = 0, tot = 0;
+    ls.forEach(function (l) { count += l.qty; sub += pub(l.m) * l.qty; tot += charged(l.m) * l.qty; });
+    L.$("[data-cart]").innerHTML = ls.length
+      ? '<ul class="cart-lines">' + ls.map(function (l) {
+          return "<li><span>" + l.qty + " × " + L.esc(l.m.name) + "</span><span>" + L.peso(charged(l.m) * l.qty) + "</span></li>";
+        }).join("") + "</ul>"
+      : '<p class="muted">Your cart is empty. Add something tasty.</p>';
+    L.$("[data-totals]").innerHTML = "<div><dt>Subtotal</dt><dd>" + L.peso(sub) + "</dd></div>" +
+      (sub !== tot ? '<div class="disc"><dt>Member discount</dt><dd>−' + L.peso(sub - tot) + "</dd></div>" : "") +
+      '<div class="grand"><dt>Total</dt><dd>' + L.peso(tot) + "</dd></div>";
+    var memberMode = L.$("[data-member-toggle]").checked;
+    var btn = L.$("[data-submit]");
+    btn.disabled = !state.accepting || !ls.length || (memberMode && !state.member);
+    var hint = !state.accepting ? "Online ordering isn't open right now — please call " + L.C.phone + "."
+      : memberMode && !state.member ? "Apply your member details first, or untick the box to order as a guest." : "";
+    L.msg(L.$("[data-hint]"), hint);
+    var bar = L.$("[data-cart-bar]");
+    bar.hidden = !count;
+    bar.innerHTML = "<span>" + count + " item" + (count === 1 ? "" : "s") + "</span><b>Checkout · " + L.peso(tot) + "</b>";
+  }
+  function render() { renderMenu(); renderCart(); }
+
+  menuEl.addEventListener("click", function (e) {
+    var inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]");
+    if (!inc && !dec) return;
+    var id = (inc || dec).getAttribute(inc ? "data-inc" : "data-dec");
+    var q = (state.cart[id] || 0) + (inc ? 1 : -1);
+    if (q <= 0) delete state.cart[id]; else state.cart[id] = Math.min(50, q);
+    save(); render();
+  });
+
+  // fulfillment segmented control
+  L.$$(".seg input").forEach(function (r) {
+    r.addEventListener("change", function () {
+      L.$$(".seg label").forEach(function (l) { l.classList.toggle("on", l.querySelector("input").checked); });
+    });
+  });
+
+  // member box
+  var toggle = L.$("[data-member-toggle]");
+  toggle.addEventListener("change", function () {
+    if (!toggle.checked) clearMember();
+    L.show(L.$("[data-member-fields]"), toggle.checked && !state.member);
+    renderCart();
+  });
+  function clearMember() {
+    state.member = null;
+    L.$("[data-m-pass]").value = "";
+    L.show(L.$("[data-m-ok]"), false);
+    L.show(L.$("[data-email-row]"), true);
+    L.msg(L.$("[data-m-msg]"), "");
+    L.show(L.$("[data-member-fields]"), toggle.checked);
+    render();
+  }
+  L.$("[data-m-apply]").addEventListener("click", function () {
+    var btn = this, email = L.$("[data-m-email]").value.trim(), pass = L.$("[data-m-pass]").value.trim();
+    if (!email || !pass) return L.msg(L.$("[data-m-msg]"), "Enter your registered email and passcode.");
+    btn.disabled = true; btn.textContent = "Checking…";
+    L.sb.rpc("check_member", { p_email: email, p_passcode: pass }).then(function (r) {
+      btn.disabled = false; btn.textContent = "Apply";
+      var d = r.data;
+      if (r.error || !d || !d.ok) return L.msg(L.$("[data-m-msg]"), (d && d.error) || "Couldn't check that right now.");
+      state.member = { name: d.name, prices: d.prices, email: email.toLowerCase(), passcode: pass };
+      L.msg(L.$("[data-m-msg]"), "");
+      L.show(L.$("[data-member-fields]"), false);
+      L.show(L.$("[data-email-row]"), false);
+      var ok = L.$("[data-m-ok]");
+      ok.innerHTML = "✓ Member prices applied for <b>" + L.esc(d.name) + '</b>. <button type="button" class="link" data-m-change>Change</button>';
+      ok.hidden = false;
+      if (!form.name.value) form.name.value = d.name;
+      if (!form.phone.value && d.phone) form.phone.value = d.phone;
+      render();
+    });
+  });
+  L.$("[data-m-ok]").addEventListener("click", function (e) { if (e.target.closest("[data-m-change]")) clearMember(); });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = L.$("[data-error]"), btn = L.$("[data-submit]");
+    L.msg(err, "");
+    if (!form.name.value.trim() || !form.phone.value.trim()) return L.msg(err, "Please enter your name and mobile number.");
+    if (!state.member && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.value.trim())) return L.msg(err, "Please enter a valid email for your receipt.");
+    btn.disabled = true; btn.textContent = "Placing order…";
+    var payload = {
+      items: lines().map(function (l) { return { id: l.m.id, qty: l.qty }; }),
+      name: form.name.value, phone: form.phone.value,
+      email: state.member ? state.member.email : form.email.value,
+      fulfillment: (L.$(".seg input:checked") || {}).value || "pickup",
+      notes: form.notes.value,
+      member: state.member ? { email: state.member.email, passcode: state.member.passcode } : null
+    };
+    L.sb.rpc("place_order", { p: payload }).then(function (r) {
+      var d = r.data;
+      if (r.error || !d || !d.ok) {
+        btn.textContent = "Checkout · Pay with GCash"; renderCart();
+        return L.msg(err, (d && d.error) || "Something went wrong placing your order. Please try again.");
+      }
+      state.cart = {}; save();
+      location.href = L.base + "/order/view/?id=" + encodeURIComponent(d.id) + "&t=" + encodeURIComponent(d.token);
+    });
+  });
+
+  // load menu + settings
+  Promise.all([
+    L.sb.from("menu_items").select("id, name, description, base_price, image_url").eq("is_available", true).order("sort_order"),
+    L.sb.from("settings").select("markup_pct, accepting_orders").eq("id", 1).maybeSingle()
+  ]).then(function (r) {
+    if (r[0].error) { menuEl.innerHTML = '<li class="err">Couldn\'t load the menu. Please refresh or call ' + L.esc(L.C.phone) + ".</li>"; return; }
+    state.items = r[0].data.map(function (m) { m.base_price = Number(m.base_price); return m; });
+    if (r[1].data) { state.markup = Number(r[1].data.markup_pct); state.accepting = r[1].data.accepting_orders; }
+    Object.keys(state.cart).forEach(function (id) { if (!state.items.some(function (m) { return m.id === id; })) delete state.cart[id]; });
+    render();
+  });
+})();

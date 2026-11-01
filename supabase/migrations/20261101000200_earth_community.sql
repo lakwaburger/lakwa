@@ -1,5 +1,5 @@
 -- ============================================================================
--- The Earth Community — guests request to join; staff approve (creates the member + emails the passcode).
+-- Each School Community — guests request to join; staff approve (creates the member + emails the passcode).
 -- Run AFTER 20261101000100_static_backend.sql. Safe to re-run.
 -- ============================================================================
 
@@ -30,15 +30,15 @@ create policy "Staff read requests" on public.membership_requests for select to 
 --   insert into private.secrets values ('staff_notify_email','you@example.com') on conflict (key) do update set value = excluded.value;
 insert into private.secrets values ('staff_notify_email', 'migquesada@gmail.com') on conflict (key) do nothing;
 
--- ---------------------------------------------------------------- passcode email (Earth Community wording)
+-- ---------------------------------------------------------------- passcode email (Each School Community wording)
 create or replace function private.passcode_email(p_name text, p_email text, p_code text, p_reset boolean) returns boolean
 language sql security definer set search_path = '' as $$
   select private.send_email(p_email,
-    case when p_reset then 'Your new Lakwa Burger Cafe passcode' else 'Welcome to The Earth Community — Lakwa Burger Cafe' end,
+    case when p_reset then 'Your new Lakwa Burger Cafe passcode' else 'Welcome to Each School Community — Lakwa Burger Cafe' end,
     '<p>Hi ' || private.esc(p_name) || ',</p><p>' ||
     case when p_reset then 'Here is your new passcode.'
-         else 'Welcome to <b>The Earth Community</b> at the Lakwa Burger Cafe! As a member you keep our original prices.' end ||
-    ' When you order online, tick “I''m an Earth Community member” at checkout and enter these details — your member price is applied automatically.</p>' ||
+         else 'Welcome to <b>Each School Community</b> at the Lakwa Burger Cafe! As a member you keep our original prices.' end ||
+    ' When you order online, tick “I''m an Each School Community member” at checkout and enter these details — your member price is applied automatically.</p>' ||
     '<table style="margin:16px 0;font-size:16px"><tr><td style="padding:4px 12px 4px 0;color:#555">Email</td><td><b>' || private.esc(p_email) ||
     '</b></td></tr><tr><td style="padding:4px 12px 4px 0;color:#555">Passcode</td><td><b style="font-size:22px;letter-spacing:3px">' || p_code ||
     '</b></td></tr></table>' || private.button(private.site_url() || '/order/', 'Order now') ||
@@ -101,12 +101,12 @@ begin
 
   insert into public.membership_requests (full_name, email, phone, message) values (nm, em, ph, ms);
 
-  perform private.send_email(em, 'We got your request — The Earth Community',
-    '<p>Hi ' || private.esc(nm) || ',</p><p>Thanks for asking to join <b>The Earth Community</b> at the Lakwa Burger Cafe. ' ||
+  perform private.send_email(em, 'We got your request — Each School Community',
+    '<p>Hi ' || private.esc(nm) || ',</p><p>Thanks for asking to join <b>Each School Community</b> at the Lakwa Burger Cafe. ' ||
     'Our team will review it and, once approved, you''ll get an email with your member passcode.</p>');
   if coalesce(notify, '') <> '' then
-    perform private.send_email(notify, 'New Earth Community request — ' || nm,
-      '<p><b>' || private.esc(nm) || '</b> (' || private.esc(em) || ', ' || private.esc(ph) || ') asked to join The Earth Community.</p>' ||
+    perform private.send_email(notify, 'New Each School Community request — ' || nm,
+      '<p><b>' || private.esc(nm) || '</b> (' || private.esc(em) || ', ' || private.esc(ph) || ') asked to join Each School Community.</p>' ||
       coalesce('<p>“' || private.esc(ms) || '”</p>', '') || private.button(private.site_url() || '/staff/#community', 'Review request'));
   end if;
   return thanks;
@@ -123,7 +123,7 @@ begin
   select * into r from public.membership_requests where id = p_id for update;
   if not found or r.status <> 'pending' then return jsonb_build_object('ok', false, 'error', 'This request was already handled.'); end if;
   res := private.create_member(r.email::text, r.full_name, r.phone, p_extra,
-                               'Earth Community request' || coalesce(': ' || r.message, ''));
+                               'Each School Community request' || coalesce(': ' || r.message, ''));
   if not (res->>'ok')::boolean then return res; end if;
   update public.membership_requests set status = 'approved', customer_id = (res->>'id')::uuid,
          reviewed_by = auth.uid(), reviewed_at = now() where id = r.id;
@@ -140,8 +140,8 @@ begin
   select * into r from public.membership_requests where id = p_id for update;
   if not found or r.status <> 'pending' then return jsonb_build_object('ok', false, 'error', 'This request was already handled.'); end if;
   update public.membership_requests set status = 'declined', review_note = note, reviewed_by = auth.uid(), reviewed_at = now() where id = r.id;
-  perform private.send_email(r.email::text, 'Your Earth Community request',
-    '<p>Hi ' || private.esc(r.full_name) || ',</p><p>Thanks for your interest in The Earth Community. We''re not able to add you right now.</p>' ||
+  perform private.send_email(r.email::text, 'Your Each School Community request',
+    '<p>Hi ' || private.esc(r.full_name) || ',</p><p>Thanks for your interest in Each School Community. We''re not able to add you right now.</p>' ||
     coalesce('<p>' || private.esc(note) || '</p>', '') || '<p>You''re always welcome at the cafe!</p>');
   return jsonb_build_object('ok', true);
 end $$;

@@ -1,5 +1,5 @@
 /* /staff/ — staff dashboard (Supabase Auth email + password).
-   Views (hash routes): #orders, #order=<id>, #payments, #customers, #menu, #settings */
+   Views (hash routes): #orders, #order=<id>, #board, #payments, #customers, #menu, #settings */
 (function () {
   "use strict";
   var sb = L.sb, esc = L.esc, peso = L.peso, $ = L.$, $$ = L.$$;
@@ -55,6 +55,8 @@
     refreshBadge();
     window.scrollTo(0, 0);
     if (h.indexOf("order=") === 0) return orderDetail(h.slice(6));
+    clearTimeout(boardTimer);
+    if (h === "board") return boardView();
     if (h.indexOf("payments") === 0) return payments();
     if (h === "community" || h === "customers") return customers();
     if (h === "menu" && me.role === "admin") return menu();
@@ -198,6 +200,79 @@
           }).join("");
         bindReviews(payments);
       });
+    });
+  }
+
+  // ------------------------------------------------------------ order board (what the cashier screen shows)
+  var boardTimer = null;
+  function boardView() {
+    view.innerHTML = '<div class="staff-head"><h1>Order board</h1><a class="btn btn--teal" href="' + L.base + '/board/" target="_blank" rel="noopener">Open the screen ↗</a>' +
+      '<p class="muted">This is what customers see on the screen at the cashier (numbers only). Online orders appear here once they\'re paid. ' +
+      "Add walk-in orders with their UTAK receipt number.</p></div>" +
+      '<form class="filters card board-walkin" data-walkin><label class="grow">Walk-in order no.' +
+      '<input name="label" maxlength="8" required autocomplete="off" placeholder="UTAK receipt no., e.g. 57"></label>' +
+      '<button class="btn btn--red">Add to Preparing</button></form>' +
+      '<p class="err" role="alert" data-error hidden></p><div data-board-lists><p class="muted">Loading…</p></div>';
+    var f = $("[data-walkin]", view);
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var label = f.label.value.trim();
+      if (!label) return;
+      $("button", f).disabled = true;
+      sb.from("board_tickets").insert({ label: label }).then(function (r) {
+        $("button", f).disabled = false;
+        if (r.error) return L.msg($("[data-error]", view), r.error.message);
+        L.msg($("[data-error]", view), "");
+        f.label.value = ""; f.label.focus();
+        loadBoard();
+      });
+    });
+    loadBoard();
+  }
+  function loadBoard() {
+    clearTimeout(boardTimer);
+    var since = new Date(Date.now() - 16 * 3600 * 1000).toISOString();
+    Promise.all([
+      sb.from("orders").select("id, order_no, status, fulfillment, customer_name, created_at, updated_at")
+        .in("status", ["paid", "preparing", "ready"]).gte("created_at", since),
+      sb.from("board_tickets").select("id, label, status, created_at, updated_at").in("status", ["preparing", "ready"]).gte("created_at", since)
+    ]).then(function (r) {
+      var box = $("[data-board-lists]", view);
+      if (!box) return;                                   // left the Board tab
+      if (r[0].error || r[1].error) return L.msg($("[data-error]", view), (r[0].error || r[1].error).message);
+      var items = r[0].data.map(function (o) {
+        var ready = o.status === "ready";
+        return { kind: "order", id: o.id, no: o.order_no.replace(/^\D*/, ""), col: ready ? "ready" : "preparing", at: ready ? o.updated_at : o.created_at,
+          sub: "Online · " + L.FUL[o.fulfillment] + " · " + o.customer_name };
+      }).concat(r[1].data.map(function (t) {
+        var ready = t.status === "ready";
+        return { kind: "walkin", id: t.id, no: t.label, col: t.status, at: ready ? t.updated_at : t.created_at, sub: "Walk-in · added " + L.when(t.created_at, { dateStyle: undefined }) };
+      }));
+      function list(col) {
+        var xs = items.filter(function (i) { return i.col === col; })
+          .sort(function (a, b) { return col === "ready" ? b.at.localeCompare(a.at) : a.at.localeCompare(b.at); });
+        return xs.map(function (i) {
+          var ref = i.kind + "|" + i.id;
+          return '<li class="board-item"><b>' + esc(i.no) + '</b><span class="muted small">' + esc(i.sub) + '</span><div class="btn-row">' +
+            (col === "preparing"
+              ? '<button class="btn btn--red" data-move="' + ref + '|ready">Ready ✓</button>' +
+                (i.kind === "walkin" ? '<button class="btn btn--outline-dark" data-move="' + ref + '|remove">Remove</button>' : "")
+              : '<button class="btn btn--teal" data-move="' + ref + '|completed">Collected</button>' +
+                '<button class="btn btn--outline-dark" data-move="' + ref + '|preparing">← Back</button>') +
+            "</div></li>";
+        }).join("") || '<li class="muted">Nothing here.</li>';
+      }
+      box.innerHTML = '<div class="board-admin"><section><h2 class="sub">Preparing</h2><ul class="board-list">' + list("preparing") + "</ul></section>" +
+        '<section><h2 class="sub">Ready — waiting to be collected</h2><ul class="board-list">' + list("ready") + "</ul></section></div>";
+      $$("[data-move]", box).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var p = b.dataset.move.split("|"), table = p[0] === "order" ? "orders" : "board_tickets";
+          b.disabled = true;
+          var q = p[2] === "remove" ? sb.from(table).delete().eq("id", p[1]) : sb.from(table).update({ status: p[2] }).eq("id", p[1]);
+          q.then(function (u) { if (u.error) L.msg($("[data-error]", view), u.error.message); loadBoard(); });
+        });
+      });
+      boardTimer = setTimeout(loadBoard, 10000);
     });
   }
 

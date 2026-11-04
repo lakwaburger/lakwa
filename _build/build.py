@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261101b"  # bump to bust browser caches after changing CSS/JS
+VER = "20261104a"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. GitHub Pages project site = "/lakwa".
 # When it moves to its own domain (or lakwamotorcycles.com/burger-cafe), change this and rebuild.
@@ -272,7 +272,7 @@ def page_staff():
   <header class="staff-bar">
     <a href="#orders" class="staff-brand">LAKWA <span>Staff</span></a>
     <nav data-staff-nav>
-      <a href="#orders">Orders</a><a href="#payments">Payments</a><a href="#community">Each School Community <span class="badge" data-req-badge hidden></span></a>
+      <a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments</a><a href="#community">Each School Community <span class="badge" data-req-badge hidden></span></a>
       <a href="#menu" data-admin>Menu &amp; prices</a><a href="#settings" data-admin>Settings</a>
       <a href="{BASE}/" target="_blank" rel="noopener">View site ↗</a>
     </nav>
@@ -306,6 +306,33 @@ we'll email you a passcode to use at checkout.</p></div>
     page("community/index.html", "Each School Community — Lakwa Burger Cafe",
          "Join Each School Community at the Lakwa Burger Cafe in El Nido and keep our original menu prices.", body, js=("community",))
 
+def page_board():
+    # The screen at the cashier. Big numbers, no names; staff move orders in /staff/#board.
+    body = f"""<div class="board" data-board>
+<header class="board-bar">
+  <div class="board-brand">LAKWA <span>Burger Cafe</span></div>
+  <div class="board-clock" data-clock></div>
+</header>
+<main class="board-cols">
+  <section class="board-col board-col--prep">
+    <h1 class="board-title">Preparing</h1>
+    <ul class="board-nums" data-prep></ul>
+  </section>
+  <section class="board-col board-col--ready">
+    <h1 class="board-title">Ready <span>Please collect</span></h1>
+    <ul class="board-nums" data-ready></ul>
+  </section>
+</main>
+<footer class="board-foot">
+  <span>Order ahead online: <b data-order-url></b></span>
+  <span class="board-status" data-status></span>
+</footer>
+<button class="board-start" data-start>Tap for sound &amp; full screen</button>
+</div>
+"""
+    page("board/index.html", "Order board — Lakwa Burger Cafe", "Order status board.", body,
+         js=("board",), noindex=True, chrome=False)
+
 def page_404():
     body = f"""<main id="main" class="page page--cream"><div class="container narrow">
 <div class="page-head"><p class="eyebrow">404</p><h1 class="display display--lg">Wrong turn</h1>
@@ -314,4 +341,4 @@ def page_404():
     page("404.html", "Not found — Lakwa Burger Cafe", "Page not found.", body, supabase=False)
 
 if __name__ == "__main__":
-    page_home(); page_order(); page_order_view(); page_orders(); page_community(); page_staff(); page_404()
+    page_home(); page_order(); page_order_view(); page_orders(); page_community(); page_staff(); page_board(); page_404()

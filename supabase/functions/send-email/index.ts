@@ -3,7 +3,7 @@
 //
 // Deploy with "Verify JWT" OFF (the database authenticates with x-hook-secret instead).
 // Secrets (Edge Functions → Secrets):
-//   GMAIL_USER          migquesada@gmail.com
+//   GMAIL_USER          lakwaburger@gmail.com
 //   GMAIL_APP_PASSWORD  16-character Google App Password (not the normal Gmail password)
 //   EMAIL_HOOK_SECRET   value of: select value from private.secrets where key = 'email_hook_secret';
 //   EMAIL_FROM_NAME     optional, default "Lakwa Burger Cafe"

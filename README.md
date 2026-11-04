@@ -28,7 +28,7 @@ Generated pages are committed. After editing `_build/build.py`, run the build an
 
 ## Each School Community (members)
 - Guests request to join at `/community/` (name, email, mobile, optional note). They get a "we got your request" email;
-  `staff_notify_email` (private.secrets, default migquesada@gmail.com) gets an alert.
+  `staff_notify_email` (private.secrets, default lakwaburger@gmail.com) gets an alert.
 - Staff → **Each School Community** → Requests: **Approve** (optional extra %) creates the member, generates a 6-digit passcode
   and emails it; **Decline** emails a polite note. Staff can also add members directly.
 - Members tick "I'm an Each School Community member" at checkout → original (pre-increase) prices.
@@ -57,13 +57,13 @@ select id, 'Name', 'staff' from auth.users where email = 'name@staff.local';
 ## Email (Gmail, for testing)
 Emails (passcodes, order received, payment confirmed/rejected) are queued by the database (`pg_net`) to the
 Edge Function `send-email` (`supabase/functions/send-email/index.ts`), which sends through Gmail SMTP as
-**migquesada@gmail.com**. Gmail allows ~500 emails/day — fine for testing; move to a domain sender before launch.
+**lakwaburger@gmail.com**. Gmail allows ~500 emails/day — fine for testing; move to a domain sender before launch.
 Until email is switched on, staff see each new passcode on screen to share themselves.
 
 To switch on:
 1. Google Account → Security → 2-Step Verification (on) → **App passwords** → create one ("Lakwa").
 2. Supabase → Edge Functions → create `send-email`, paste the code, **Verify JWT off**, Deploy.
-3. Edge Functions → Secrets: `GMAIL_USER` = migquesada@gmail.com, `GMAIL_APP_PASSWORD` = the app password,
+3. Edge Functions → Secrets: `GMAIL_USER` = lakwaburger@gmail.com, `GMAIL_APP_PASSWORD` = the app password,
    `EMAIL_HOOK_SECRET` = result of `select value from private.secrets where key = 'email_hook_secret';`
 4. SQL Editor: `insert into private.secrets values ('email_enabled','true') on conflict (key) do update set value = 'true';`
 

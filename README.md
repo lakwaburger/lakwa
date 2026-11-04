@@ -1,7 +1,7 @@
 # Lakwa Burger Cafe — website
 
 Static site (HTML/CSS/JS) on GitHub Pages + Supabase (project **lakwa**, ref `hwkydsigfcgbyiyukzbr`, account migquesada).
-Rebuilt from https://lakwamotorcycles.com/burger-cafe. Live at https://migquesada.github.io/lakwa/
+Rebuilt from https://lakwamotorcycles.com/burger-cafe. Live at https://lakwaburger.com/ (GitHub Pages, custom domain via the CNAME file)
 
 ## Structure
 ```

@@ -6,11 +6,11 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261104c"  # bump to bust browser caches after changing CSS/JS
+VER = "20261104d"  # bump to bust browser caches after changing CSS/JS
 
-# Where the site lives. GitHub Pages project site = "/lakwa".
-# When it moves to its own domain (or lakwamotorcycles.com/burger-cafe), change this and rebuild.
-BASE = "/lakwa"
+# Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
+# Was "/lakwa" when served from migquesada.github.io/lakwa/.
+BASE = ""
 
 CDN = "https://images.squarespace-cdn.com/content/v1/66ee374b9956fe4e4593e2cc"
 SITE = {

@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261104d"  # bump to bust browser caches after changing CSS/JS
+VER = "20261104e"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -272,10 +272,11 @@ def page_staff():
   <header class="staff-bar">
     <a href="#orders" class="staff-brand">LAKWA <span>Staff</span></a>
     <nav data-staff-nav>
-      <a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments</a><a href="#community">Each School Community <span class="badge" data-req-badge hidden></span></a>
+      <a href="#today">Today</a><a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments <span class="badge" data-pay-badge hidden></span></a><a href="#community">Each School Community <span class="badge" data-req-badge hidden></span></a>
       <a href="#menu" data-admin>Menu &amp; prices</a><a href="#settings" data-admin>Settings</a>
       <a href="{BASE}/" target="_blank" rel="noopener">View site ↗</a>
     </nav>
+    <button class="store-toggle" data-store hidden></button>
     <div class="staff-user"><span data-who></span><button class="link" data-signout>Sign out</button></div>
   </header>
   <main class="staff-main" data-view><p class="muted">Loading…</p></main>

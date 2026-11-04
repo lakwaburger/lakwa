@@ -6,19 +6,24 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261104e"  # bump to bust browser caches after changing CSS/JS
+VER = "20261104f"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
 BASE = ""
 
 CDN = "https://images.squarespace-cdn.com/content/v1/66ee374b9956fe4e4593e2cc"
+
+def local(path, fallback):
+    """Use the copy in this repo when it exists, else the old Squarespace image."""
+    return BASE + path if os.path.exists(os.path.join(ROOT, path.lstrip("/"))) else fallback
 SITE = {
     "name": "Lakwa Burger Cafe",
     "brand": "Lakwa Motorcycle Tours",
     "main": "https://lakwamotorcycles.com",
     "logo": f"{CDN}/8984bcaf-9fff-45b9-aeee-f2c6c766cd3e/Untitled-7.png?format=500w",
-    "hero": f"{CDN}/a81a023e-2415-4f00-af1a-0247f41efcbc/edbae927-58c6-469e-80a1-fb893f9cd834.jpg?format=2500w",
+    # Photos live in this repo (assets/img): the Squarespace image server is blocked on some networks (e.g. the cafe's Starlink).
+    "hero": local("/assets/img/hero.jpg", f"{CDN}/a81a023e-2415-4f00-af1a-0247f41efcbc/edbae927-58c6-469e-80a1-fb893f9cd834.jpg?format=2500w"),
     "badge": f"{CDN}/d45edc45-997f-4687-b370-a41c37ddd510/580b57fcd9996e24bc43c543.png?format=300w",
     "favicon": f"{CDN}/9472beb5-5b7e-4ed1-9041-5f9f8ebf079c/favicon.ico",
     "address": ["Kalye Artisano, Lio Estate", "Villa Libertad, El Nido, Palawan 5315"],
@@ -32,12 +37,12 @@ SITE = {
 
 # Shown on the homepage before live prices load (mirrors supabase/seed.sql). Prices = base (pre-increase).
 MENU = [
-    ("Cheese", "120 GR. Beef Patty, home made brioche, Edam cheese, Ketchup and Lakwanaise.", 249, f"{CDN}/2367956d-de03-40e6-ab71-cf893bb9dd0d/cheeseburegr.jpg"),
-    ("Bacon Cheese", "120 GR Beef Patty, Home made Brioche, Edam Cheese, Bacon, Ketchup, Lakwanaise", 289, f"{CDN}/6af2c29a-a075-4f87-accc-b6088e4961e0/baconburger.jpg"),
-    ("Crispy Chicken", "150 GR Chicken Thigh Patty, Home made Brioche, IceBerg Lettuce, Ketchup, Lakwanaise", 269, f"{CDN}/8fa4c3e6-25f3-4851-899f-f2d5eb9d4612/chiken.jpg"),
-    ("Mozzarella Fingers", "Fried Breaded Mozzarella Sticks", 189, f"{CDN}/30479f6d-31ce-4906-9ac3-adb5d10c35bb/cheesesticks.jpg"),
+    ("Cheese burger", "120 GR. Beef Patty, home made brioche, Edam cheese, Ketchup and Lakwanaise.", 349, local("/assets/img/menu/classic-burgers-cheese-burger.jpg", f"{CDN}/2367956d-de03-40e6-ab71-cf893bb9dd0d/cheeseburegr.jpg")),
+    ("Bacon Cheese", "120 GR Beef Patty, Home made Brioche, Edam Cheese, Bacon, Ketchup, Lakwanaise", 599, local("/assets/img/menu/classic-burgers-bacon-cheese.jpg", f"{CDN}/6af2c29a-a075-4f87-accc-b6088e4961e0/baconburger.jpg")),
+    ("Crispy Chicken", "150 GR Chicken Thigh Patty, Home made Brioche, IceBerg Lettuce, Ketchup, Lakwanaise", 699, local("/assets/img/menu/classic-burgers-crispy-chicken.jpg", f"{CDN}/8fa4c3e6-25f3-4851-899f-f2d5eb9d4612/chiken.jpg")),
+    ("Double Cheese", "Two beef patties, double cheese, home made brioche.", 699, local("/assets/img/menu/classic-burgers-double-cheese.jpg", "")),
 ]
-MARKUP = 20
+MARKUP = 0  # mirrors Settings → price increase (only used for the first paint; live prices load from the database)
 
 MAIN_NAV = [
     ("Home", SITE["main"] + "/"), ("Enduro", SITE["main"] + "/tours"), ("ADVenture", SITE["main"] + "/adv-tours"),
@@ -72,7 +77,7 @@ def head(title, desc, noindex=False):
 <meta property="og:site_name" content="{E(SITE['brand'])}">
 <meta property="og:title" content="{E(title)}">
 <meta property="og:description" content="{E(desc)}">
-<meta property="og:image" content="{SITE['hero']}">
+<meta property="og:image" content="{SITE['hero'] if SITE['hero'].startswith('http') else 'https://lakwaburger.com' + SITE['hero']}">
 <meta name="theme-color" content="#b10b0e">
 <link rel="icon" href="{SITE['favicon']}">
 <link rel="preconnect" href="https://fonts.googleapis.com">

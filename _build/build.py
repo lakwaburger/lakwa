@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261104b"  # bump to bust browser caches after changing CSS/JS
+VER = "20261104c"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. GitHub Pages project site = "/lakwa".
 # When it moves to its own domain (or lakwamotorcycles.com/burger-cafe), change this and rebuild.
@@ -315,7 +315,7 @@ def page_board():
 </header>
 <main class="board-cols">
   <section class="board-col board-col--in">
-    <h1 class="board-title">Incoming <span>Checking payment</span></h1>
+    <h1 class="board-title">Incoming <span>Awaiting payment</span></h1>
     <ul class="board-nums" data-in></ul>
   </section>
   <section class="board-col board-col--prep">

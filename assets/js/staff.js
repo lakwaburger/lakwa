@@ -207,7 +207,7 @@
   var boardTimer = null;
   function boardView() {
     view.innerHTML = '<div class="staff-head"><h1>Order board</h1><a class="btn btn--teal" href="' + L.base + '/board/" target="_blank" rel="noopener">Open the screen ↗</a>' +
-      '<p class="muted">This is what customers see on the screen at the cashier (numbers only). Online orders show as Incoming once the customer uploads their GCash screenshot, and move to Preparing when you verify it. ' +
+      '<p class="muted">This is what customers see on the screen at the cashier (numbers only). Online orders show as Incoming until their payment is verified, then move to Preparing. Orders stay on the board until Collected or cancelled. ' +
       "Add walk-in orders with their UTAK receipt number.</p></div>" +
       '<form class="filters card board-walkin" data-walkin><label class="grow">Walk-in order no.' +
       '<input name="label" maxlength="8" required autocomplete="off" placeholder="UTAK receipt no., e.g. 57"></label>' +
@@ -231,11 +231,10 @@
   }
   function loadBoard() {
     clearTimeout(boardTimer);
-    var since = new Date(Date.now() - 16 * 3600 * 1000).toISOString();
     Promise.all([
       sb.from("orders").select("id, order_no, status, fulfillment, customer_name, created_at, updated_at")
-        .in("status", ["payment_submitted", "paid", "preparing", "ready"]).gte("created_at", since),
-      sb.from("board_tickets").select("id, label, status, created_at, updated_at").in("status", ["preparing", "ready"]).gte("created_at", since)
+        .in("status", ["awaiting_payment", "payment_submitted", "paid", "preparing", "ready"]),
+      sb.from("board_tickets").select("id, label, status, created_at, updated_at").in("status", ["preparing", "ready"])
     ]).then(function (r) {
       var box = $("[data-board-lists]", view);
       if (!box) return;                                   // left the Board tab
@@ -243,8 +242,10 @@
       var items = r[0].data.map(function (o) {
         var ready = o.status === "ready";
         return { kind: "order", id: o.id, no: o.order_no.replace(/^\D*/, ""), at: ready ? o.updated_at : o.created_at,
-          col: o.status === "payment_submitted" ? "incoming" : ready ? "ready" : "preparing",
-          sub: "Online · " + L.FUL[o.fulfillment] + " · " + o.customer_name };
+          col: o.status === "awaiting_payment" || o.status === "payment_submitted" ? "incoming" : ready ? "ready" : "preparing",
+          status: o.status,
+          sub: "Online · " + (o.status === "awaiting_payment" ? "no GCash screenshot yet · " : o.status === "payment_submitted" ? "screenshot to check · " : "") +
+            L.FUL[o.fulfillment] + " · " + o.customer_name + " · " + L.when(o.created_at, { dateStyle: "short" }) };
       }).concat(r[1].data.map(function (t) {
         var ready = t.status === "ready";
         return { kind: "walkin", id: t.id, no: t.label, col: t.status, at: ready ? t.updated_at : t.created_at, sub: "Walk-in · added " + L.when(t.created_at, { dateStyle: undefined }) };
@@ -256,7 +257,7 @@
           var ref = i.kind + "|" + i.id;
           return '<li class="board-item"><b>' + esc(i.no) + '</b><span class="muted small">' + esc(i.sub) + '</span><div class="btn-row">' +
             (col === "incoming"
-              ? '<a class="btn btn--teal" href="#order=' + i.id + '">Check payment →</a>'
+              ? '<a class="btn btn--teal" href="#order=' + i.id + '">' + (i.status === "payment_submitted" ? "Check payment →" : "Open order →") + "</a>"
               : col === "preparing"
               ? '<button class="btn btn--red" data-move="' + ref + '|ready">Ready ✓</button>' +
                 (i.kind === "walkin" ? '<button class="btn btn--outline-dark" data-move="' + ref + '|remove">Remove</button>' : "")
@@ -265,7 +266,7 @@
             "</div></li>";
         }).join("") || '<li class="muted">Nothing here.</li>';
       }
-      box.innerHTML = '<div class="board-admin"><section><h2 class="sub">Incoming — payment to check</h2><ul class="board-list">' + list("incoming") + "</ul></section>" +
+      box.innerHTML = '<div class="board-admin"><section><h2 class="sub">Incoming — not verified yet</h2><ul class="board-list">' + list("incoming") + "</ul></section>" +
         '<section><h2 class="sub">Preparing</h2><ul class="board-list">' + list("preparing") + "</ul></section>" +
         '<section><h2 class="sub">Ready — waiting to be collected</h2><ul class="board-list">' + list("ready") + "</ul></section></div>";
       $$("[data-move]", box).forEach(function (b) {

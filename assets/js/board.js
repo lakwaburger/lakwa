@@ -1,5 +1,5 @@
 /* /board/ — the order screen at the cashier. Public: shows numbers only (public.order_board()).
-   Columns: Incoming (payment uploaded, not yet verified) → Preparing → Ready.
+   Columns: Incoming (payment not verified yet) → Preparing → Ready.
    Refreshes every 5 s, chimes when a number turns ready, keeps the screen awake. */
 (function () {
   "use strict";

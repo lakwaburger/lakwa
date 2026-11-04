@@ -38,15 +38,14 @@ function encodeSubject(s: string) {
   return words.join(" ");
 }
 
+// Reuse the SMTP connection, but rebuild it if GMAIL_USER / GMAIL_APP_PASSWORD changed in Secrets.
 let transport: ReturnType<typeof nodemailer.createTransport> | null = null;
+let transportKey = "";
 function smtp() {
-  if (!transport) {
-    transport = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user: env("GMAIL_USER"), pass: env("GMAIL_APP_PASSWORD").replace(/\s/g, "") },
-    });
+  const user = env("GMAIL_USER").trim(), pass = env("GMAIL_APP_PASSWORD").replace(/\s/g, "");
+  if (!transport || transportKey !== user + "\n" + pass) {
+    transport = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user, pass } });
+    transportKey = user + "\n" + pass;
   }
   return transport;
 }
@@ -65,7 +64,7 @@ Deno.serve(async (req) => {
   const { to, subject, html } = body;
   if (!to || !subject || !html || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return new Response("Missing fields", { status: 400 });
 
-  const user = env("GMAIL_USER");
+  const user = env("GMAIL_USER").trim();
   try {
     const info = await smtp().sendMail({
       from: `${env("EMAIL_FROM_NAME", "Lakwa Burger Cafe")} <${user}>`,

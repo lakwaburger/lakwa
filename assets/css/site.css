@@ -414,9 +414,14 @@ input[type="checkbox"], input[type="radio"] { width: auto; }
 .board-brand { font-family: var(--font-button); font-size: clamp(22px, 3vw, 56px); letter-spacing: .04em; }
 .board-brand span { font-family: var(--font-display); font-weight: 600; opacity: .7; margin-left: .3em; }
 .board-clock { font-size: clamp(22px, 3vw, 56px); font-weight: 700; font-variant-numeric: tabular-nums; }
-.board-cols { display: grid; grid-template-columns: 2fr 3fr; min-height: 0; }
+.board-cols { display: grid; grid-template-columns: 1.3fr 2fr 2.6fr; min-height: 0; }
 .board-col { container-type: inline-size; display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 3vh 3vw; }
-.board-col--prep { background: #252a2b; }
+.board-col--in { background: var(--ink); color: rgba(229, 225, 215, .7); }
+.board-col--in .board-num { border-style: dashed; }
+.board-col--in .board-title { font-size: min(3vw, 13cqw); }
+.board-col--in .board-nums { grid-template-columns: minmax(0, 1fr); font-size: 22cqw; }
+.board-col--in .board-nums--md, .board-col--in .board-nums--sm { grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: 12cqw; }
+.board-col--prep { background: #2b3132; }
 .board-col--ready { background: var(--red); }
 .board-title {
   display: flex; flex-wrap: wrap; align-items: baseline; gap: .2em .6em; margin: 0 0 3vh;
@@ -460,7 +465,7 @@ input[type="checkbox"], input[type="radio"] { width: auto; }
 }
 @keyframes board-blink { 50% { opacity: .25; } }
 @media (orientation: portrait) {
-  .board-cols { grid-template-columns: 1fr; grid-template-rows: 2fr 3fr; }
+  .board-cols { grid-template-columns: 1fr; grid-template-rows: 1fr 2fr 3fr; }
   .board-nums--xl { grid-template-columns: repeat(3, minmax(0, 1fr)); font-size: 10cqw; }
   .board-nums--lg { grid-template-columns: repeat(4, minmax(0, 1fr)); font-size: 7.4cqw; }
   .board-nums--md { grid-template-columns: repeat(5, minmax(0, 1fr)); font-size: 5.9cqw; }
@@ -471,8 +476,8 @@ input[type="checkbox"], input[type="radio"] { width: auto; }
 }
 /* staff → Board tab */
 .board-walkin input { font-size: 22px; }
-.board-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.board-admin { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .board-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .board-item { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 16px; padding: 12px 16px; background: #fff; border-radius: 10px; border: 1px solid #e3ded2; }
 .board-item b { grid-row: span 2; font-family: var(--font-display); font-size: 44px; line-height: 1; min-width: 2.2em; }
-@media (max-width: 760px) { .board-admin { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .board-admin { grid-template-columns: 1fr; } }

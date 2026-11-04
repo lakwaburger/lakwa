@@ -1,9 +1,10 @@
 /* /board/ — the order screen at the cashier. Public: shows numbers only (public.order_board()).
+   Columns: Incoming (payment uploaded, not yet verified) → Preparing → Ready.
    Refreshes every 5 s, chimes when a number turns ready, keeps the screen awake. */
 (function () {
   "use strict";
   var $ = L.$, esc = L.esc;
-  var prepEl = $("[data-prep]"), readyEl = $("[data-ready]"), statusEl = $("[data-status]"), clockEl = $("[data-clock]");
+  var inEl = $("[data-in]"), prepEl = $("[data-prep]"), readyEl = $("[data-ready]"), statusEl = $("[data-status]"), clockEl = $("[data-clock]");
   var POLL = 5000, FRESH = 60000;          // a number counts as "just ready" for 60 s
   var seenReady = null, audio = null, wake = null;
 
@@ -18,6 +19,9 @@
 
   function render(d) {
     var now = new Date(d.now).getTime(), fresh = [];
+    var incoming = d.incoming || [];
+    inEl.className = "board-nums board-nums--" + size(incoming.length);
+    inEl.innerHTML = incoming.map(function (i) { return li(i); }).join("") || '<li class="board-empty">—</li>';
     prepEl.className = "board-nums board-nums--" + size(d.preparing.length);
     readyEl.className = "board-nums board-nums--" + size(d.ready.length);
     prepEl.innerHTML = d.preparing.map(function (i) { return li(i); }).join("") ||

@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261105d"  # bump to bust browser caches after changing CSS/JS
+VER = "20261105e"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -25,7 +25,7 @@ SITE = {
     # Photos live in this repo (assets/img): the Squarespace image server is blocked on some networks (e.g. the cafe's Starlink).
     "hero": local("/assets/img/hero.jpg", f"{CDN}/a81a023e-2415-4f00-af1a-0247f41efcbc/edbae927-58c6-469e-80a1-fb893f9cd834.jpg?format=2500w"),
     "badge": local("/assets/img/badge.png", f"{CDN}/d45edc45-997f-4687-b370-a41c37ddd510/580b57fcd9996e24bc43c543.png?format=300w"),
-    "favicon": f"{CDN}/9472beb5-5b7e-4ed1-9041-5f9f8ebf079c/favicon.ico",
+    "favicon": local("/assets/img/favicon.png", f"{CDN}/9472beb5-5b7e-4ed1-9041-5f9f8ebf079c/favicon.ico"),
     "address": ["Kalye Artisano, Lio Estate", "Villa Libertad, El Nido, Palawan 5315"],
     "phone": "(0931) 154-9766",
     "tel": "+639311549766",
@@ -37,9 +37,9 @@ SITE = {
 
 # Shown on the homepage before live prices load (mirrors supabase/seed.sql). Prices = base (pre-increase).
 MENU = [
-    ("Cheese burger", "120 GR. Beef Patty, home made brioche, Edam cheese, Ketchup and Lakwanaise.", 349, local("/assets/img/menu/classic-burgers-cheese-burger.jpg", f"{CDN}/2367956d-de03-40e6-ab71-cf893bb9dd0d/cheeseburegr.jpg")),
-    ("Bacon Cheese", "120 GR Beef Patty, Home made Brioche, Edam Cheese, Bacon, Ketchup, Lakwanaise", 599, local("/assets/img/menu/classic-burgers-bacon-cheese.jpg", f"{CDN}/6af2c29a-a075-4f87-accc-b6088e4961e0/baconburger.jpg")),
-    ("Crispy Chicken", "150 GR Chicken Thigh Patty, Home made Brioche, IceBerg Lettuce, Ketchup, Lakwanaise", 699, local("/assets/img/menu/classic-burgers-crispy-chicken.jpg", f"{CDN}/8fa4c3e6-25f3-4851-899f-f2d5eb9d4612/chiken.jpg")),
+    ("Cheese burger", "120 GR. Beef Patty, home made brioche, Edam cheese, Ketchup and Lakwanaise.", 349, local("/assets/img/menu/classic-burgers-cheese-burger.jpg", "https://hwkydsigfcgbyiyukzbr.supabase.co/storage/v1/object/public/site-images/menu/mw1th7qcmwx8u.jpg")),
+    ("Bacon Cheese", "120 GR Beef Patty, Home made Brioche, Edam Cheese, Bacon, Ketchup, Lakwanaise", 599, local("/assets/img/menu/classic-burgers-bacon-cheese.jpg", "https://hwkydsigfcgbyiyukzbr.supabase.co/storage/v1/object/public/site-images/menu/mw1ti01qjtvn8.jpg")),
+    ("Crispy Chicken", "150 GR Chicken Thigh Patty, Home made Brioche, IceBerg Lettuce, Ketchup, Lakwanaise", 699, local("/assets/img/menu/classic-burgers-crispy-chicken.jpg", "https://hwkydsigfcgbyiyukzbr.supabase.co/storage/v1/object/public/site-images/menu/mw1tjducqykek.jpg")),
     ("Double Cheese", "Two beef patties, double cheese, home made brioche.", 699, local("/assets/img/menu/classic-burgers-double-cheese.jpg", "")),
 ]
 MARKUP = 0  # mirrors Settings → price increase (only used for the first paint; live prices load from the database)
@@ -80,6 +80,7 @@ def head(title, desc, noindex=False):
 <meta property="og:image" content="{SITE['hero'] if SITE['hero'].startswith('http') else 'https://lakwaburger.com' + SITE['hero']}">
 <meta name="theme-color" content="#b10b0e">
 <link rel="icon" href="{SITE['favicon']}">
+<link rel="apple-touch-icon" href="{BASE}/assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@600;700&family=Space+Grotesk:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">

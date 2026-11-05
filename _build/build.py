@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261105c"  # bump to bust browser caches after changing CSS/JS
+VER = "20261105d"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -94,7 +94,7 @@ def header():
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="header-inner">
     <nav class="header-nav header-nav--left" aria-label="Cafe">
-      <a href="{BASE}/#menu">Menu</a><a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Earth School Community</a><a href="{BASE}/orders/">My orders</a>
+      <a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Earth School Community</a><a href="{BASE}/orders/">My orders</a>
     </nav>
     <a href="{BASE}/" class="logo" aria-label="{E(SITE['brand'])}">
       <img src="{SITE['logo']}" alt="{E(SITE['brand'])}" onerror="this.remove()">
@@ -300,14 +300,13 @@ def page_community():
     body = f"""<main id="main" class="page page--cream"><div class="container narrow">
 <div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Earth School Community</h1>
 <p class="lede">Our prices went up, but not for our community. Members of Earth School Community keep the original menu prices
-every time they order. Tell us a little about yourself and our team will review your request — once you're approved,
+every time they order. Send us your details and our team will review your request — once you're approved,
 we'll email you a passcode to use at checkout.</p></div>
 <div data-community>
 <form class="card fields narrow-form" data-community-form novalidate>
   <label>Full name<input name="name" required autocomplete="name"></label>
   <label>Email<input name="email" type="email" required autocomplete="email"></label>
   <label>Mobile number<input name="phone" type="tel" required autocomplete="tel" placeholder="09xx xxx xxxx"></label>
-  <label>How do you know Lakwa? (optional)<textarea name="message" rows="3" maxlength="500" placeholder="Rider, neighbour, regular, friend of…"></textarea></label>
   <p class="err" role="alert" data-error hidden></p>
   <button class="btn btn--red btn--block">Request to join</button>
 </form>

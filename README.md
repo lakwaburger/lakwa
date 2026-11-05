@@ -9,8 +9,8 @@ _build/build.py       Page templates + facts (address, phone, menu fallback, BAS
 index.html            Homepage (menu prices load live from Supabase)
 order/                Cart + checkout (guest or registered customer)
 order/view/           Order receipt / tracker + GCash receipt upload  (?id=…&t=…)
-orders/               Order history for Each School Community members (email + passcode)
-community/            Request to join Each School Community (staff approve → passcode emailed)
+orders/               Order history for Earth School Community members (email + passcode)
+community/            Request to join Earth School Community (staff approve → passcode emailed)
 staff/                Staff dashboard (email + password login)
 assets/               css/site.css, js/config.js (publishable key), js/*.js
 supabase/migrations/  Database schema + functions (run in order in the SQL Editor)
@@ -26,12 +26,12 @@ Generated pages are committed. After editing `_build/build.py`, run the build an
   (optionally an extra % off, set per customer).
 - Totals are always calculated in the database (`place_order`), never trusted from the browser.
 
-## Each School Community (members)
+## Earth School Community (members)
 - Guests request to join at `/community/` (name, email, mobile, optional note). They get a "we got your request" email;
   `staff_notify_email` (private.secrets, default lakwamotorcycles@gmail.com) gets an alert.
-- Staff → **Each School Community** → Requests: **Approve** (optional extra %) creates the member, generates a 6-digit passcode
+- Staff → **Earth School Community** → Requests: **Approve** (optional extra %) creates the member, generates a 6-digit passcode
   and emails it; **Decline** emails a polite note. Staff can also add members directly.
-- Members tick "I'm an Each School Community member" at checkout → original (pre-increase) prices.
+- Members tick "I'm an Earth School Community member" at checkout → original (pre-increase) prices.
 
 ## Ordering & GCash
 1. Customer orders → gets an order page link (also emailed).

@@ -1,4 +1,4 @@
-/* /community/ — request to join Each School Community. Staff approve it in the dashboard. */
+/* /community/ — request to join Earth School Community. Staff approve it in the dashboard. */
 (function () {
   "use strict";
   var form = L.$("[data-community-form]");

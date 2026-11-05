@@ -450,7 +450,7 @@
     Promise.all([q, sb.from("membership_requests").select("*").eq("status", "pending").order("created_at")]).then(function (rr) {
       var r = rr[0], reqs = rr[1].data || [];
       if (r.error) return fail(r.error);
-      view.innerHTML = '<div class="staff-head"><h1>Each School Community</h1><p class="muted">Members pay the original (pre-increase) price when they enter their email + passcode at checkout. Guests request to join at <a href="' + L.base + '/community/" target="_blank" rel="noopener">/community/</a>.</p></div>' +
+      view.innerHTML = '<div class="staff-head"><h1>Earth School Community</h1><p class="muted">Members pay the original (pre-increase) price when they enter their email + passcode at checkout. Guests request to join at <a href="' + L.base + '/community/" target="_blank" rel="noopener">/community/</a>.</p></div>' +
         '<section class="card"><h2 class="card-title">Requests to join (' + reqs.length + ')</h2>' +
         (reqs.length ? reqs.map(function (q) {
           return '<div class="req" data-req="' + q.id + '"><div><b>' + esc(q.full_name) + '</b><div class="muted small">' + esc(q.email) + " · " + esc(q.phone || "") +

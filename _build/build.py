@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261105b"  # bump to bust browser caches after changing CSS/JS
+VER = "20261105c"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -47,7 +47,7 @@ MARKUP = 0  # mirrors Settings → price increase (only used for the first paint
 MAIN_NAV = [
     ("Home", SITE["main"] + "/"), ("Enduro", SITE["main"] + "/tours"), ("ADVenture", SITE["main"] + "/adv-tours"),
     ("VLOG", SITE["main"] + "/moto-blog-2"), ("Maps", SITE["main"] + "/lakwa-packages"), ("Motel", SITE["main"] + "/motel"),
-    ("Burger Cafe", BASE + "/"), ("Order online", BASE + "/order/"), ("Each School Community", BASE + "/community/"),
+    ("Burger Cafe", BASE + "/"), ("Order online", BASE + "/order/"), ("Earth School Community", BASE + "/community/"),
     ("My orders", BASE + "/orders/"),
     ("+ More to do", "https://www.lakwaexperiences.com/"), ("About", SITE["main"] + "/about"),
 ]
@@ -94,7 +94,7 @@ def header():
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="header-inner">
     <nav class="header-nav header-nav--left" aria-label="Cafe">
-      <a href="{BASE}/#menu">Menu</a><a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Each School Community</a><a href="{BASE}/orders/">My orders</a>
+      <a href="{BASE}/#menu">Menu</a><a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Earth School Community</a><a href="{BASE}/orders/">My orders</a>
     </nav>
     <a href="{BASE}/" class="logo" aria-label="{E(SITE['brand'])}">
       <img src="{SITE['logo']}" alt="{E(SITE['brand'])}" onerror="this.remove()">
@@ -171,7 +171,7 @@ def page_home():
     <ul class="menu-grid" data-home-menu>
 {cards}
     </ul>
-    <div class="menu-cta"><a href="{BASE}/order/" class="btn btn--cream">Order online</a><p>Each School Community member? Your member price is applied at checkout. <a href="{BASE}/community/">Request to join →</a></p></div>
+    <div class="menu-cta"><a href="{BASE}/order/" class="btn btn--cream">Order online</a><p>Earth School Community member? Your member price is applied at checkout. <a href="{BASE}/community/">Request to join →</a></p></div>
   </div>
 </section>
 <section class="section section--teal feature">
@@ -197,7 +197,7 @@ def page_home():
 def page_order():
     body = f"""<main id="main" class="page page--cream"><div class="container">
 <div class="page-head"><p class="eyebrow">Order online</p><h1 class="display display--lg">Build your order</h1>
-<p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Each School Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
+<p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Earth School Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
 <div class="order-layout">
   <div class="order-menu-wrap">
     <div class="menu-tools" data-menu-tools hidden>
@@ -210,7 +210,7 @@ def page_order():
     <h2 class="display display--sm">Your order</h2>
     <div data-cart><p class="muted">Your cart is empty. Add something tasty.</p></div>
     <fieldset class="member-box">
-      <label class="check"><input type="checkbox" data-member-toggle> I'm an Each School Community member</label>
+      <label class="check"><input type="checkbox" data-member-toggle> I'm an Earth School Community member</label>
       <div class="member-fields" data-member-fields hidden>
         <input type="email" placeholder="Member email" autocomplete="email" data-m-email>
         <input type="password" inputmode="numeric" placeholder="Passcode" autocomplete="current-password" data-m-pass>
@@ -253,7 +253,7 @@ def page_order_view():
 def page_orders():
     body = """<main id="main" class="page page--cream"><div class="container narrow">
 <div class="page-head"><p class="eyebrow">Order history</p><h1 class="display display--lg">My orders</h1>
-<p class="lede">Each School Community members: sign in with your email and passcode to see every order. Ordered as a guest? Use the link in your order email.</p></div>
+<p class="lede">Earth School Community members: sign in with your email and passcode to see every order. Ordered as a guest? Use the link in your order email.</p></div>
 <div data-history>
 <form class="card fields narrow-form" data-history-form>
   <label>Member email<input name="email" type="email" required autocomplete="email"></label>
@@ -283,7 +283,7 @@ def page_staff():
   <header class="staff-bar">
     <a href="#orders" class="staff-brand">LAKWA <span>Staff</span></a>
     <nav data-staff-nav>
-      <a href="#today">Today</a><a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments <span class="badge" data-pay-badge hidden></span></a><a href="#community">Each School Community <span class="badge" data-req-badge hidden></span></a>
+      <a href="#today">Today</a><a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments <span class="badge" data-pay-badge hidden></span></a><a href="#community">Earth School Community <span class="badge" data-req-badge hidden></span></a>
       <a href="#menu" data-admin>Menu &amp; prices</a><a href="#settings" data-admin>Settings</a>
       <a href="{BASE}/" target="_blank" rel="noopener">View site ↗</a>
     </nav>
@@ -298,8 +298,8 @@ def page_staff():
 
 def page_community():
     body = f"""<main id="main" class="page page--cream"><div class="container narrow">
-<div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Each School Community</h1>
-<p class="lede">Our prices went up, but not for our community. Members of Each School Community keep the original menu prices
+<div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Earth School Community</h1>
+<p class="lede">Our prices went up, but not for our community. Members of Earth School Community keep the original menu prices
 every time they order. Tell us a little about yourself and our team will review your request — once you're approved,
 we'll email you a passcode to use at checkout.</p></div>
 <div data-community>
@@ -311,12 +311,12 @@ we'll email you a passcode to use at checkout.</p></div>
   <p class="err" role="alert" data-error hidden></p>
   <button class="btn btn--red btn--block">Request to join</button>
 </form>
-<p class="muted small">Already a member? Just order — tick “I'm an Each School Community member” at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
+<p class="muted small">Already a member? Just order — tick “I'm an Earth School Community member” at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
 </div>
 </div></main>
 """
-    page("community/index.html", "Each School Community — Lakwa Burger Cafe",
-         "Join Each School Community at the Lakwa Burger Cafe in El Nido and keep our original menu prices.", body, js=("community",))
+    page("community/index.html", "Earth School Community — Lakwa Burger Cafe",
+         "Join Earth School Community at the Lakwa Burger Cafe in El Nido and keep our original menu prices.", body, js=("community",))
 
 def page_board():
     # The screen at the cashier. Big numbers, no names; staff move orders in /staff/#board.

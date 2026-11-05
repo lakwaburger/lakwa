@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261105e"  # bump to bust browser caches after changing CSS/JS
+VER = "20261105f"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -45,11 +45,8 @@ MENU = [
 MARKUP = 0  # mirrors Settings → price increase (only used for the first paint; live prices load from the database)
 
 MAIN_NAV = [
-    ("Home", SITE["main"] + "/"), ("Enduro", SITE["main"] + "/tours"), ("ADVenture", SITE["main"] + "/adv-tours"),
-    ("VLOG", SITE["main"] + "/moto-blog-2"), ("Maps", SITE["main"] + "/lakwa-packages"), ("Motel", SITE["main"] + "/motel"),
-    ("Burger Cafe", BASE + "/"), ("Order online", BASE + "/order/"), ("Earth School Community", BASE + "/community/"),
+    ("Home", BASE + "/"), ("Order online", BASE + "/order/"), ("Earth School Community", BASE + "/community/"),
     ("My orders", BASE + "/orders/"),
-    ("+ More to do", "https://www.lakwaexperiences.com/"), ("About", SITE["main"] + "/about"),
 ]
 TICKER = ["Dine in", "Order ahead", "Ride thru", "Home made brioche", "Lakwanaise on everything", "Lio Estate, El Nido"]
 
@@ -90,15 +87,15 @@ def head(title, desc, noindex=False):
 
 def header():
     nav = "\n".join(
-        f'<a href="{E(h)}"{CUR if l == "Burger Cafe" else ""}>{E(l)}</a>' for l, h in MAIN_NAV)
+        f'<a href="{E(h)}"{CUR if l == "Home" else ""}>{E(l)}</a>' for l, h in MAIN_NAV)
     return f"""<header class="site-header">
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="header-inner">
     <nav class="header-nav header-nav--left" aria-label="Cafe">
       <a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Earth School Community</a><a href="{BASE}/orders/">My orders</a>
     </nav>
-    <a href="{BASE}/" class="logo" aria-label="{E(SITE['brand'])}">
-      <img src="{SITE['logo']}" alt="{E(SITE['brand'])}" onerror="this.remove()">
+    <a href="{BASE}/" class="logo" aria-label="{E(SITE['name'])}">
+      <img src="{SITE['logo']}" alt="{E(SITE['name'])}" onerror="this.remove()">
       <span class="logo-fallback">LAKWA</span>
     </a>
     <div class="header-actions">
@@ -114,7 +111,7 @@ def footer():
     return f"""<footer id="visit" class="section section--teal footer">
   <div class="container">
     <div class="footer-cols">
-      <div><p class="footer-label">Company</p><p class="footer-links"><a href="{SITE['main']}/about">About us</a><a href="{SITE['main']}/contact-us">Contact us</a></p></div>
+      <div><p class="footer-label">Burger Cafe</p><p class="footer-links"><a href="{BASE}/order/">Order online</a><a href="{BASE}/orders/">My orders</a></p></div>
       <div><p class="footer-label">Social Media</p><p class="footer-links"><a href="{SITE['instagram']}" target="_blank" rel="noopener">Instagram</a><a href="{SITE['facebook']}" target="_blank" rel="noopener">Facebook</a></p></div>
       <div><p class="footer-label">Find us</p><p class="footer-links"><a href="{SITE['maps']}" target="_blank" rel="noopener">Directions</a><a href="{SITE['whatsapp']}" target="_blank" rel="noopener">WhatsApp</a></p></div>
     </div>
@@ -191,7 +188,7 @@ def page_home():
 </section>
 </main>
 """
-    page("index.html", "Burger Cafe — Lakwa Motorcycle Tours",
+    page("index.html", "Lakwa Burger Cafe — El Nido, Palawan",
          "Lakwa Burger Cafe in El Nido, Palawan. Dine in, order ahead or ride thru for burgers on home made brioche with Lakwanaise.",
          body, js=("home",))
 

@@ -50,6 +50,39 @@
   }
   $$("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
+  // Photo viewer: click a menu photo (homepage cards, order page) to see it bigger. Esc / click closes.
+  var box = null, lastFocus = null;
+  function closeZoom() {
+    if (!box || box.hidden) return;
+    box.hidden = true; document.body.classList.remove("zoom-open");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function openZoom(src, caption, from) {
+    if (!box) {
+      box = document.createElement("div");
+      box.className = "zoom"; box.hidden = true;
+      box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", "Photo");
+      box.innerHTML = '<button type="button" class="zoom-close" aria-label="Close photo">&times;</button>' +
+        '<figure class="zoom-fig"><img alt=""><figcaption></figcaption></figure>';
+      box.addEventListener("click", function (e) { if (!e.target.closest(".zoom-fig img")) closeZoom(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeZoom(); });
+      document.body.appendChild(box);
+    }
+    lastFocus = from;
+    var img = box.querySelector("img");
+    img.src = src; img.alt = caption || "";
+    box.querySelector("figcaption").textContent = caption || "";
+    box.hidden = false; document.body.classList.add("zoom-open");
+    box.querySelector(".zoom-close").focus();
+  }
+  document.addEventListener("click", function (e) {
+    var img = e.target.closest(".menu-card-img img, .order-item-img img");
+    if (!img) return;
+    var card = img.closest(".menu-card, .order-item");
+    var name = card && card.querySelector("h3") ? card.querySelector("h3").textContent : img.alt;
+    openZoom(img.currentSrc || img.src, name, img);
+  });
+
   window.L = {
     C: C, sb: sb, esc: esc, peso: peso, publicPrice: publicPrice, memberPrice: memberPrice, sized: sized,
     when: when, FUL: FUL, STATUS: STATUS, $: $, $$: $$, show: show, msg: msg, base: C.base || ""

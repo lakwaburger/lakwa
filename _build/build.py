@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261104f"  # bump to bust browser caches after changing CSS/JS
+VER = "20261105b"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -21,10 +21,10 @@ SITE = {
     "name": "Lakwa Burger Cafe",
     "brand": "Lakwa Motorcycle Tours",
     "main": "https://lakwamotorcycles.com",
-    "logo": f"{CDN}/8984bcaf-9fff-45b9-aeee-f2c6c766cd3e/Untitled-7.png?format=500w",
+    "logo": local("/assets/img/logo.png", f"{CDN}/8984bcaf-9fff-45b9-aeee-f2c6c766cd3e/Untitled-7.png?format=500w"),
     # Photos live in this repo (assets/img): the Squarespace image server is blocked on some networks (e.g. the cafe's Starlink).
     "hero": local("/assets/img/hero.jpg", f"{CDN}/a81a023e-2415-4f00-af1a-0247f41efcbc/edbae927-58c6-469e-80a1-fb893f9cd834.jpg?format=2500w"),
-    "badge": f"{CDN}/d45edc45-997f-4687-b370-a41c37ddd510/580b57fcd9996e24bc43c543.png?format=300w",
+    "badge": local("/assets/img/badge.png", f"{CDN}/d45edc45-997f-4687-b370-a41c37ddd510/580b57fcd9996e24bc43c543.png?format=300w"),
     "favicon": f"{CDN}/9472beb5-5b7e-4ed1-9041-5f9f8ebf079c/favicon.ico",
     "address": ["Kalye Artisano, Lio Estate", "Villa Libertad, El Nido, Palawan 5315"],
     "phone": "(0931) 154-9766",
@@ -199,7 +199,13 @@ def page_order():
 <div class="page-head"><p class="eyebrow">Order online</p><h1 class="display display--lg">Build your order</h1>
 <p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Each School Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
 <div class="order-layout">
-  <ul class="order-menu" data-menu><li class="muted">Loading the menu…</li></ul>
+  <div class="order-menu-wrap">
+    <div class="menu-tools" data-menu-tools hidden>
+      <input type="search" class="menu-search" placeholder="Search the menu…" aria-label="Search the menu" autocomplete="off" data-search>
+      <nav class="menu-chips" aria-label="Menu sections" data-chips></nav>
+    </div>
+    <div class="order-menu" data-menu><p class="muted">Loading the menu…</p></div>
+  </div>
   <form id="checkout" class="checkout card" data-checkout novalidate>
     <h2 class="display display--sm">Your order</h2>
     <div data-cart><p class="muted">Your cart is empty. Add something tasty.</p></div>

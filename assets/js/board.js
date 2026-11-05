@@ -21,7 +21,7 @@
     var now = new Date(d.now).getTime(), fresh = [];
     var incoming = d.incoming || [];
     inEl.className = "board-nums board-nums--" + size(incoming.length);
-    inEl.innerHTML = incoming.map(function (i) { return li(i); }).join("") || '<li class="board-empty">—</li>';
+    inEl.innerHTML = incoming.map(function (i) { return li(i); }).join("") || '<li class="board-empty">-</li>';
     prepEl.className = "board-nums board-nums--" + size(d.preparing.length);
     readyEl.className = "board-nums board-nums--" + size(d.ready.length);
     prepEl.innerHTML = d.preparing.map(function (i) { return li(i); }).join("") ||
@@ -30,7 +30,7 @@
       var isNew = now - new Date(i.at).getTime() < FRESH;
       if (seenReady && !seenReady[key(i)]) fresh.push(i);
       return li(i, isNew ? "is-new" : "");
-    }).join("") || '<li class="board-empty">—</li>';
+    }).join("") || '<li class="board-empty">-</li>';
     var next = {};
     d.ready.forEach(function (i) { next[key(i)] = true; });
     if (fresh.length) chime();
@@ -43,7 +43,7 @@
       statusEl.textContent = "";
       render(r.data);
     }).catch(function () {
-      statusEl.textContent = "Reconnecting…";
+      statusEl.textContent = "Reconnecting...";
     }).then(function () { setTimeout(poll, POLL); });
   }
 

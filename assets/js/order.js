@@ -69,7 +69,7 @@
         "<span>" + items.length + (items.length === 1 ? " item" : " items") + '</span><span class="mg-chev" aria-hidden="true"></span></span></button>' +
         (open ? '<ul class="mg-items">' + items.map(itemHtml).join("") + "</ul>" : "") + "</section>";
     }).join("");
-    menuEl.innerHTML = html || (q ? '<p class="muted">Nothing on the menu matches “' + L.esc(state.query.trim()) + '”.</p>'
+    menuEl.innerHTML = html || (q ? '<p class="muted">Nothing on the menu matches &quot;' + L.esc(state.query.trim()) + '&quot;.</p>'
       : '<p class="muted">The menu is empty right now.</p>');
     chipsEl.innerHTML = state.groups.map(function (g) {
       var n = inCart(g);
@@ -102,7 +102,7 @@
     var memberMode = L.$("[data-member-toggle]").checked;
     var btn = L.$("[data-submit]");
     btn.disabled = !state.accepting || !ls.length || (memberMode && !state.member);
-    var hint = !state.accepting ? "Online ordering isn't open right now — please call " + L.C.phone + "."
+    var hint = !state.accepting ? "Online ordering isn't open right now. Please call " + L.C.phone + "."
       : memberMode && !state.member ? "Apply your member details first, or untick the box to order as a guest." : "";
     L.msg(L.$("[data-hint]"), hint);
     var bar = L.$("[data-cart-bar]");
@@ -154,7 +154,7 @@
   L.$("[data-m-apply]").addEventListener("click", function () {
     var btn = this, email = L.$("[data-m-email]").value.trim(), pass = L.$("[data-m-pass]").value.trim();
     if (!email || !pass) return L.msg(L.$("[data-m-msg]"), "Enter your registered email and passcode.");
-    btn.disabled = true; btn.textContent = "Checking…";
+    btn.disabled = true; btn.textContent = "Checking...";
     L.sb.rpc("check_member", { p_email: email, p_passcode: pass }).then(function (r) {
       btn.disabled = false; btn.textContent = "Apply";
       var d = r.data;
@@ -179,7 +179,7 @@
     L.msg(err, "");
     if (!form.name.value.trim() || !form.phone.value.trim()) return L.msg(err, "Please enter your name and mobile number.");
     if (!state.member && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.value.trim())) return L.msg(err, "Please enter a valid email for your receipt.");
-    btn.disabled = true; btn.textContent = "Placing order…";
+    btn.disabled = true; btn.textContent = "Placing order...";
     var payload = {
       items: lines().map(function (l) { return { id: l.m.id, qty: l.qty }; }),
       name: form.name.value, phone: form.phone.value,

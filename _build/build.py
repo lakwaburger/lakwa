@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261105f"  # bump to bust browser caches after changing CSS/JS
+VER = "20261106a"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -188,7 +188,7 @@ def page_home():
 </section>
 </main>
 """
-    page("index.html", "Lakwa Burger Cafe — El Nido, Palawan",
+    page("index.html", "Lakwa Burger Cafe | El Nido, Palawan",
          "Lakwa Burger Cafe in El Nido, Palawan. Dine in, order ahead or ride thru for burgers on home made brioche with Lakwanaise.",
          body, js=("home",))
 
@@ -199,10 +199,10 @@ def page_order():
 <div class="order-layout">
   <div class="order-menu-wrap">
     <div class="menu-tools" data-menu-tools hidden>
-      <input type="search" class="menu-search" placeholder="Search the menu…" aria-label="Search the menu" autocomplete="off" data-search>
+      <input type="search" class="menu-search" placeholder="Search the menu..." aria-label="Search the menu" autocomplete="off" data-search>
       <nav class="menu-chips" aria-label="Menu sections" data-chips></nav>
     </div>
-    <div class="order-menu" data-menu><p class="muted">Loading the menu…</p></div>
+    <div class="order-menu" data-menu><p class="muted">Loading the menu...</p></div>
   </div>
   <form id="checkout" class="checkout card" data-checkout novalidate>
     <h2 class="display display--sm">Your order</h2>
@@ -226,7 +226,7 @@ def page_order():
         <label class="on"><input type="radio" name="fulfillment" value="pickup" checked> Pick up</label>
         <label><input type="radio" name="fulfillment" value="ride_thru"> Ride thru</label>
       </div>
-      <label>Notes (optional)<textarea name="notes" rows="2" placeholder="No lettuce, extra Lakwanaise, ETA…"></textarea></label>
+      <label>Notes (optional)<textarea name="notes" rows="2" placeholder="No lettuce, extra Lakwanaise, ETA..."></textarea></label>
     </div>
     <dl class="totals" data-totals></dl>
     <p class="err" role="alert" data-error hidden></p>
@@ -237,15 +237,15 @@ def page_order():
 </div>
 </div></main>
 """
-    page("order/index.html", "Order — Lakwa Burger Cafe", "Order burgers online from the Lakwa Burger Cafe, El Nido. Pay with GCash.",
+    page("order/index.html", "Order | Lakwa Burger Cafe", "Order burgers online from the Lakwa Burger Cafe, El Nido. Pay with GCash.",
          body, js=("order",))
 
 def page_order_view():
     body = """<main id="main" class="page page--cream"><div class="container narrow" data-order-view>
-<p class="muted">Loading your order…</p>
+<p class="muted">Loading your order...</p>
 </div></main>
 """
-    page("order/view/index.html", "Your order — Lakwa Burger Cafe", "Your Lakwa Burger Cafe order.", body,
+    page("order/view/index.html", "Your order | Lakwa Burger Cafe", "Your Lakwa Burger Cafe order.", body,
          js=("order-view",), noindex=True)
 
 def page_orders():
@@ -262,7 +262,7 @@ def page_orders():
 </div>
 </div></main>
 """
-    page("orders/index.html", "My orders — Lakwa Burger Cafe", "Order history for registered customers.", body,
+    page("orders/index.html", "My orders | Lakwa Burger Cafe", "Order history for registered customers.", body,
          js=("orders",), noindex=True)
 
 def page_staff():
@@ -288,18 +288,18 @@ def page_staff():
     <button class="store-toggle" data-store hidden></button>
     <div class="staff-user"><span data-who></span><button class="link" data-signout>Sign out</button></div>
   </header>
-  <main class="staff-main" data-view><p class="muted">Loading…</p></main>
+  <main class="staff-main" data-view><p class="muted">Loading...</p></main>
 </div>
 </div>
 """
-    page("staff/index.html", "Staff — Lakwa Burger Cafe", "Staff dashboard.", body, js=("staff",), noindex=True, chrome=False)
+    page("staff/index.html", "Staff | Lakwa Burger Cafe", "Staff dashboard.", body, js=("staff",), noindex=True, chrome=False)
 
 def page_community():
     body = f"""<main id="main" class="page page--cream"><div class="container narrow">
 <div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Earth School Community</h1>
-<p class="lede">Our prices went up, but not for our community. Members of Earth School Community keep the original menu prices
-every time they order. Send us your details and our team will review your request — once you're approved,
-we'll email you a passcode to use at checkout.</p></div>
+<p class="lede">Members of Earth School Community get a community price. It's reflected in your orders automatically
+when you check out with your member email and passcode. Send us your details and our team will review your request.
+Once you're approved, we'll email you a passcode to use at checkout.</p></div>
 <div data-community>
 <form class="card fields narrow-form" data-community-form novalidate>
   <label>Full name<input name="name" required autocomplete="name"></label>
@@ -308,12 +308,12 @@ we'll email you a passcode to use at checkout.</p></div>
   <p class="err" role="alert" data-error hidden></p>
   <button class="btn btn--red btn--block">Request to join</button>
 </form>
-<p class="muted small">Already a member? Just order — tick “I'm an Earth School Community member” at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
+<p class="muted small">Already a member? Just order and tick "I'm an Earth School Community member" at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
 </div>
 </div></main>
 """
-    page("community/index.html", "Earth School Community — Lakwa Burger Cafe",
-         "Join Earth School Community at the Lakwa Burger Cafe in El Nido and keep our original menu prices.", body, js=("community",))
+    page("community/index.html", "Earth School Community | Lakwa Burger Cafe",
+         "Join Earth School Community at the Lakwa Burger Cafe in El Nido and get a community price on your orders.", body, js=("community",))
 
 def page_board():
     # The screen at the cashier. Big numbers, no names; staff move orders in /staff/#board.
@@ -343,7 +343,7 @@ def page_board():
 <button class="board-start" data-start>Tap for sound &amp; full screen</button>
 </div>
 """
-    page("board/index.html", "Order board — Lakwa Burger Cafe", "Order status board.", body,
+    page("board/index.html", "Order board | Lakwa Burger Cafe", "Order status board.", body,
          js=("board",), noindex=True, chrome=False)
 
 def page_404():
@@ -351,7 +351,7 @@ def page_404():
 <div class="page-head"><p class="eyebrow">404</p><h1 class="display display--lg">Wrong turn</h1>
 <p class="lede">That page doesn't exist. <a href="{BASE}/">Back to the Burger Cafe</a>.</p></div></div></main>
 """
-    page("404.html", "Not found — Lakwa Burger Cafe", "Page not found.", body, supabase=False)
+    page("404.html", "Not found | Lakwa Burger Cafe", "Page not found.", body, supabase=False)
 
 if __name__ == "__main__":
     page_home(); page_order(); page_order_view(); page_orders(); page_community(); page_staff(); page_board(); page_404()

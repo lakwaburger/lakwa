@@ -41,7 +41,7 @@
   $("[data-login-form]").addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target, btn = $("button", f);
-    btn.disabled = true; btn.textContent = "Signing in…";
+    btn.disabled = true; btn.textContent = "Signing in...";
     sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value }).then(function (r) {
       btn.disabled = false; btn.textContent = "Sign in";
       if (r.error) return L.msg($("[data-error]", f), "Wrong email or password.");
@@ -73,7 +73,7 @@
       b.textContent = r.count || ""; b.hidden = !r.count;
     });
   }
-  function loading() { view.innerHTML = '<p class="muted">Loading…</p>'; }
+  function loading() { view.innerHTML = '<p class="muted">Loading...</p>'; }
   function fail(e) { view.innerHTML = '<div class="notice notice--warn">' + esc(e && e.message || "Something went wrong.") + "</div>"; }
   function pill(s) { return '<span class="pill pill--' + s + '">' + (L.STATUS[s] || s) + "</span>"; }
   function clean(q) { return String(q || "").replace(/[,()%*]/g, " ").trim(); }
@@ -121,7 +121,7 @@
     ]).then(function (r) {
       var newest = (r[0].data && r[0].data[0] && r[0].data[0].id) || "", pays = r[1].count || 0;
       var b = $("[data-pay-badge]"); b.textContent = pays || ""; b.hidden = !pays;
-      document.title = (pays ? "(" + pays + ") " : "") + "Staff — Lakwa Burger Cafe";
+      document.title = (pays ? "(" + pays + ") " : "") + "Staff | Lakwa Burger Cafe";
       var fresh = seen.order !== null && (newest !== seen.order || pays > seen.pays);
       seen.order = newest; seen.pays = pays;
       if (fresh && me) {
@@ -160,7 +160,7 @@
         '<p class="muted">Online orders only. Sales count paid orders (paid → completed); cancelled and unpaid orders are left out.</p></div>' +
         '<div class="kpis">' +
         stat("Sales", peso(sales), ok.length + " paid order" + (ok.length === 1 ? "" : "s")) +
-        stat("Average order", ok.length ? peso(Math.round(sales / ok.length)) : "—") +
+        stat("Average order", ok.length ? peso(Math.round(sales / ok.length)) : "-") +
         stat("Waiting for payment", waiting, waiting ? '<a href="#payments">Check payments →</a>' : "") +
         stat("In the kitchen", open, open ? '<a href="#board">Open the board →</a>' : "") +
         stat("Members", ok.filter(function (o) { return o.is_member; }).length, "discounts " + peso(sum(ok, function (o) { return o.discount; }))) +
@@ -174,7 +174,7 @@
         "</tbody></table></section></div>" +
         '<section class="card"><h2 class="card-title">Download orders (spreadsheet)</h2>' +
         '<form class="filters" data-export><label>From <input type="date" name="from" value="' + (day.from || d) + '"></label><label>To <input type="date" name="to" value="' + (day.to || d) + '"></label>' +
-        '<button class="btn btn--teal">Download CSV</button></form><p class="muted small">Opens in Excel or Google Sheets. One row per order, with its items — handy for matching against UTAK.</p>' +
+        '<button class="btn btn--teal">Download CSV</button></form><p class="muted small">Opens in Excel or Google Sheets. One row per order, with its items. Handy for matching against UTAK.</p>' +
         '<p class="err" role="alert" data-error hidden></p></section>';
       var df = $("[data-day]", view);
       df.d.addEventListener("change", function () { day.date = df.d.value; today(); });
@@ -184,7 +184,7 @@
         var f = e.target, btn = $("button", f);
         day.from = f.from.value; day.to = f.to.value;
         if (!day.from || !day.to || day.from > day.to) return L.msg($("[data-error]", view), "Pick a From date that's on or before the To date.");
-        btn.disabled = true; btn.textContent = "Preparing…";
+        btn.disabled = true; btn.textContent = "Preparing...";
         exportCsv(day.from, day.to).catch(function (x) { L.msg($("[data-error]", view), x.message); }).then(function () { btn.disabled = false; btn.textContent = "Download CSV"; });
       });
     });
@@ -237,7 +237,7 @@
             '<div class="muted small">' + esc(o.phone) + " · " + esc(o.email) + "</div></td><td>" + L.FUL[o.fulfillment] + "</td><td>" + peso(o.total) +
             (Number(o.discount) > 0 ? '<div class="muted small">−' + peso(o.discount) + " member</div>" : "") + "</td><td>" + pill(o.status) + "</td></tr>";
         }).join("") || '<tr><td colspan="6" class="muted">No orders here.</td></tr>') + "</tbody></table></div>" +
-        (list.length ? '<p class="muted small">' + list.length + " orders · " + peso(sum) + " total" + (list.length === 200 ? " (showing latest 200 — narrow the dates)" : "") + "</p>" : "");
+        (list.length ? '<p class="muted small">' + list.length + " orders · " + peso(sum) + " total" + (list.length === 200 ? " (showing latest 200, narrow the dates)" : "") + "</p>" : "");
       $$("[data-tab]", view).forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); filters.status = a.dataset.tab; orders(); }); });
       $("[data-filters]", view).addEventListener("submit", function (e) {
         e.preventDefault(); var f = e.target; filters.q = f.q.value; filters.from = f.from.value; filters.to = f.to.value; orders();
@@ -264,8 +264,8 @@
       '<p class="muted small">Check the cafe\'s GCash history shows ' + peso(total) + " received before verifying.</p>" +
       (p.status === "submitted"
         ? '<form class="review-form" data-review="' + p.id + '"><input name="note" placeholder="Note to customer (shown if rejected)"><div class="btn-row">' +
-          '<button name="d" value="verify" class="btn btn--teal">Verified — start preparing</button><button name="d" value="reject" class="btn btn--outline-dark">Reject</button></div></form>'
-        : "<p>" + '<span class="pill pill--' + p.status + '">' + p.status + "</span> " + (p.review_note ? '<span class="muted small">“' + esc(p.review_note) + "”</span>" : "") + "</p>") +
+          '<button name="d" value="verify" class="btn btn--teal">Verified, start preparing</button><button name="d" value="reject" class="btn btn--outline-dark">Reject</button></div></form>'
+        : "<p>" + '<span class="pill pill--' + p.status + '">' + p.status + "</span> " + (p.review_note ? '<span class="muted small">&quot;' + esc(p.review_note) + "&quot;</span>" : "") + "</p>") +
       "</div></div>";
   }
   function bindReviews(after) {
@@ -295,7 +295,7 @@
           NEXT[o.status].map(function (n) { return '<button class="btn ' + (n[0] === "cancelled" ? "btn--outline-dark" : "btn--red") + '" data-set="' + n[0] + '">' + n[1] + "</button>"; }).join("") +
           '<button class="btn btn--outline-dark" data-print>Print ticket</button></div></div><div class="staff-grid"><section class="card"><h2 class="card-title">Customer</h2><p><b>' + esc(o.customer_name) + "</b> " +
           (o.is_member ? '<span class="pill pill--member">Member</span>' : "") + '</p><p><a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a> · <a href="mailto:' + esc(o.email) + '">' + esc(o.email) +
-          "</a></p><p>" + L.FUL[o.fulfillment] + " · " + L.when(o.created_at) + "</p>" + (o.notes ? '<p class="notice">“' + esc(o.notes) + "”</p>" : "") +
+          "</a></p><p>" + L.FUL[o.fulfillment] + " · " + L.when(o.created_at) + "</p>" + (o.notes ? '<p class="notice">&quot;' + esc(o.notes) + "&quot;</p>" : "") +
           '</section><section class="card"><h2 class="card-title">Items</h2><ul class="cart-lines">' +
           o.order_items.map(function (it) {
             var c = Number(it.charged_unit_price) * it.qty, u = Number(it.unit_price) * it.qty;
@@ -346,7 +346,7 @@
       enrich(r.data).then(function (pays) {
         view.innerHTML = '<div class="staff-head"><h1>Payments</h1></div>' +
           '<h2 class="sub">Waiting for review (' + pays.length + ")</h2>" +
-          (!pays.length ? '<p class="muted">All caught up — no payments waiting.</p>' : "") +
+          (!pays.length ? '<p class="muted">All caught up. No payments waiting.</p>' : "") +
           pays.map(function (p) {
             return '<section class="card"><h3 class="card-title"><a href="#order=' + p.order_id + '">' + esc(p.orders.order_no) + "</a> · " + esc(p.orders.customer_name) + " " +
               pill(p.orders.status) + "</h3>" + paymentHtml(p, p.orders.total) + "</section>";
@@ -365,7 +365,7 @@
       '<form class="filters card board-walkin" data-walkin><label class="grow">Walk-in order no.' +
       '<input name="label" maxlength="8" required autocomplete="off" placeholder="UTAK receipt no., e.g. 57"></label>' +
       '<button class="btn btn--red">Add to Preparing</button></form>' +
-      '<p class="err" role="alert" data-error hidden></p><div data-board-lists><p class="muted">Loading…</p></div>';
+      '<p class="err" role="alert" data-error hidden></p><div data-board-lists><p class="muted">Loading...</p></div>';
     var f = $("[data-walkin]", view);
     f.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -419,9 +419,9 @@
             "</div></li>";
         }).join("") || '<li class="muted">Nothing here.</li>';
       }
-      box.innerHTML = '<div class="board-admin"><section><h2 class="sub">Incoming — not verified yet</h2><ul class="board-list">' + list("incoming") + "</ul></section>" +
+      box.innerHTML = '<div class="board-admin"><section><h2 class="sub">Incoming (not verified yet)</h2><ul class="board-list">' + list("incoming") + "</ul></section>" +
         '<section><h2 class="sub">Preparing</h2><ul class="board-list">' + list("preparing") + "</ul></section>" +
-        '<section><h2 class="sub">Ready — waiting to be collected</h2><ul class="board-list">' + list("ready") + "</ul></section></div>";
+        '<section><h2 class="sub">Ready (waiting to be collected)</h2><ul class="board-list">' + list("ready") + "</ul></section></div>";
       $$("[data-move]", box).forEach(function (b) {
         b.addEventListener("click", function () {
           var p = b.dataset.move.split("|"), table = p[0] === "order" ? "orders" : "board_tickets";
@@ -439,7 +439,7 @@
     if (!d.ok) return '<p class="err">' + esc(d.error) + "</p>";
     return '<div class="notice ' + (d.emailed ? "notice--ok" : "notice--warn") + '">' +
       (d.emailed ? "Passcode emailed to <b>" + esc(d.email) + "</b>." : "<b>Email isn't switched on yet.</b> Share this passcode with " + esc(d.name) + " yourself:") +
-      '<div class="passcode">' + esc(d.passcode) + '</div><span class="muted small">Shown once — it\'s stored encrypted and can\'t be viewed again.</span></div>';
+      '<div class="passcode">' + esc(d.passcode) + '</div><span class="muted small">Shown once. It\'s stored encrypted and can\'t be viewed again.</span></div>';
   }
   function customers(search, flash) {
     loading();
@@ -450,11 +450,11 @@
     Promise.all([q, sb.from("membership_requests").select("*").eq("status", "pending").order("created_at")]).then(function (rr) {
       var r = rr[0], reqs = rr[1].data || [];
       if (r.error) return fail(r.error);
-      view.innerHTML = '<div class="staff-head"><h1>Earth School Community</h1><p class="muted">Members pay the original (pre-increase) price when they enter their email + passcode at checkout. Guests request to join at <a href="' + L.base + '/community/" target="_blank" rel="noopener">/community/</a>.</p></div>' +
+      view.innerHTML = '<div class="staff-head"><h1>Earth School Community</h1><p class="muted">Members get the community price when they enter their email + passcode at checkout. Guests request to join at <a href="' + L.base + '/community/" target="_blank" rel="noopener">/community/</a>.</p></div>' +
         '<section class="card"><h2 class="card-title">Requests to join (' + reqs.length + ')</h2>' +
         (reqs.length ? reqs.map(function (q) {
           return '<div class="req" data-req="' + q.id + '"><div><b>' + esc(q.full_name) + '</b><div class="muted small">' + esc(q.email) + " · " + esc(q.phone || "") +
-            " · " + L.when(q.created_at) + "</div>" + (q.message ? '<p class="small">“' + esc(q.message) + "”</p>" : "") +
+            " · " + L.when(q.created_at) + "</div>" + (q.message ? '<p class="small">&quot;' + esc(q.message) + "&quot;</p>" : "") +
             '</div><div class="req-actions"><label class="small">Extra % <input type="number" min="0" max="100" value="0" data-req-extra></label>' +
             '<button class="btn btn--teal" data-approve>Approve &amp; email passcode</button>' +
             '<input placeholder="Reason (optional, emailed)" data-req-note><button class="btn btn--outline-dark" data-decline>Decline</button></div>' +
@@ -480,7 +480,7 @@
         }).join("") || '<tr><td colspan="5" class="muted">No registered customers yet.</td></tr>') + "</tbody></table></div>";
 
       $("[data-new]", view).addEventListener("submit", function (e) {
-        e.preventDefault(); var f = e.target, b = $("button", f); b.disabled = true; b.textContent = "Creating…";
+        e.preventDefault(); var f = e.target, b = $("button", f); b.disabled = true; b.textContent = "Creating...";
         sb.rpc("create_customer", { p_email: f.email.value, p_name: f.name.value, p_phone: f.phone.value, p_extra: Number(f.extra.value) || 0, p_notes: f.notes.value })
           .then(function (x) {
             var d = x.error ? { ok: false, error: x.error.message } : x.data;
@@ -492,7 +492,7 @@
       $$("[data-req]", view).forEach(function (box) {
         var id = box.dataset.req, out = $("[data-req-result]", box);
         $("[data-approve]", box).addEventListener("click", function () {
-          var b = this; b.disabled = true; b.textContent = "Approving…";
+          var b = this; b.disabled = true; b.textContent = "Approving...";
           sb.rpc("approve_membership", { p_id: id, p_extra: Number($("[data-req-extra]", box).value) || 0 }).then(function (x) {
             var d = x.error ? { ok: false, error: x.error.message } : x.data;
             if (d.ok) return customers(search, passcodeResult(d));
@@ -516,7 +516,7 @@
         var un = $("[data-unlock]", tr); if (un) un.addEventListener("click", function () { upd({ failed_attempts: 0, locked_until: null }); });
         $("[data-reset]", tr).addEventListener("click", function () {
           var b = this; if (!confirm("Send a new passcode? The old one stops working.")) return;
-          b.disabled = true; b.textContent = "Sending…";
+          b.disabled = true; b.textContent = "Sending...";
           sb.rpc("reset_passcode", { p_id: id }).then(function (x) {
             b.disabled = false; b.textContent = "New passcode";
             $("[data-reset-result]", tr).innerHTML = passcodeResult(x.error ? { ok: false, error: x.error.message } : x.data);
@@ -572,11 +572,11 @@
         return '<form class="card fields grid-form menu-edit" data-item="' + (it ? it.id : "") + '">' +
           '<div class="full menu-photo">' + (it ? thumb(it) : '<span class="menu-thumb">No photo</span>') +
           '<div><label>Photo<input name="photo" type="file" accept="image/*"></label>' +
-          '<span class="hint">JPG or PNG from your phone is fine — it\'s resized automatically.</span>' +
+          '<span class="hint">JPG or PNG from your phone is fine. It\'s resized automatically.</span>' +
           (it && it.image_url ? ' <button type="button" class="link" data-remove-photo>Remove photo</button>' : "") + "</div></div>" +
           '<label>Name<input name="name" required value="' + esc(it ? it.name : "") + '"></label>' +
           '<label>Category<input name="category" list="menu-cats" value="' + esc(it ? it.category : (menuFilter.cat || "Burgers")) + '"></label>' +
-          '<label>Base price (₱)' + (markup ? " — before the +" + markup + "% increase" : "") + '<input name="base_price" type="number" min="0" step="1" required value="' + base + '">' +
+          '<label>Base price (₱)' + (markup ? " (before the +" + markup + "% increase)" : "") + '<input name="base_price" type="number" min="0" step="1" required value="' + base + '">' +
           (it ? '<span class="hint">Public pays <b>' + peso(L.publicPrice(base, markup)) + "</b> · Members pay <b>" + peso(L.memberPrice(base)) + "</b> (before their extra %)</span>" : "") + "</label>" +
           '<label>Sort order<input name="sort_order" type="number" value="' + (it ? it.sort_order : 99) + '"><span class="hint">Lower numbers show first.</span></label>' +
           '<label class="full">Description<input name="description" value="' + esc(it ? it.description : "") + '"></label>' +
@@ -638,7 +638,7 @@
             sort_order: Number(f.sort_order.value) || 0, description: f.description.value.trim(), is_available: f.is_available.checked
           };
           if (!data.name) return L.msg(err, "Give the item a name.");
-          btn.disabled = true; btn.textContent = f.photo.files[0] ? "Uploading photo…" : "Saving…";
+          btn.disabled = true; btn.textContent = f.photo.files[0] ? "Uploading photo..." : "Saving...";
           var photo = f.photo.files[0] ? uploadImage(f.photo.files[0], "menu") : Promise.resolve(null);
           photo.then(function (url) {
             if (url) data.image_url = url;
@@ -709,7 +709,7 @@
           gcash_name: f.gcash_name.value.trim(), gcash_number: f.gcash_number.value.trim()
         };
         if (f.qr_remove && f.qr_remove.checked) data.gcash_qr_url = null;
-        saved.textContent = f.qr.files[0] ? "Uploading QR…" : "Saving…";
+        saved.textContent = f.qr.files[0] ? "Uploading QR..." : "Saving...";
         (f.qr.files[0] ? uploadImage(f.qr.files[0], "gcash") : Promise.resolve(null)).then(function (url) {
           if (url) data.gcash_qr_url = url;
           return sb.from("settings").update(data).eq("id", 1);

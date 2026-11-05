@@ -1,4 +1,4 @@
-/* /order/view/?id=…&t=… — receipt, status tracker and GCash proof upload. */
+/* /order/view/?id=...&t=... — receipt, status tracker and GCash proof upload. */
 (function () {
   "use strict";
   var root = L.$("[data-order-view]");
@@ -25,7 +25,7 @@
     var rejected = o.payments.filter(function (p) { return p.status === "rejected"; })[0];
     var h = '<div class="page-head"><p class="eyebrow">Order ' + L.esc(o.order_no) + '</p><h1 class="display display--lg">' + L.STATUS[o.status] +
       '</h1><p class="lede">' + L.when(o.created_at) + " · " + L.FUL[o.fulfillment] + (o.is_member ? " · Member pricing" : "") +
-      '</p><p class="muted small">Bookmark this page — it\'s your receipt and order tracker.</p></div>';
+      '</p><p class="muted small">Bookmark this page. It\'s your receipt and order tracker.</p></div>';
     if (o.status !== "cancelled") {
       h += '<ol class="steps">' + ["Pay", "Confirmed", "Preparing", "Ready", "Done"].map(function (l, i) {
         return '<li class="' + (stepIdx >= i + 1 ? "on" : "") + '">' + l + "</li>";
@@ -50,7 +50,7 @@
         '<p class="err" role="alert" data-error hidden></p>' +
         '<button class="btn btn--red btn--block">Submit payment</button></form></section>';
     } else if (pending) {
-      h += '<div class="notice notice--ok"><b>Receipt received.</b> We\'re checking your GCash payment — this page updates when it\'s confirmed.</div>';
+      h += '<div class="notice notice--ok"><b>Receipt received.</b> We\'re checking your GCash payment. This page updates when it\'s confirmed.</div>';
     }
 
     if (o.payments.length) {
@@ -76,7 +76,7 @@
     if (!file) return L.msg(err, "Please attach a screenshot of your GCash receipt.");
     if (file.size > 6 * 1024 * 1024) return L.msg(err, "Screenshot is too large (max 6 MB).");
     if (file.type && ALLOWED.indexOf(file.type) < 0) return L.msg(err, "Upload a JPG, PNG, WEBP, HEIC or PDF.");
-    btn.disabled = true; btn.textContent = "Uploading…";
+    btn.disabled = true; btn.textContent = "Uploading...";
     var ext = ((file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg").slice(0, 5);
     var rand = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
     var path = id + "/" + token + "/" + rand + "." + ext;

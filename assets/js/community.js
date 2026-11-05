@@ -9,7 +9,7 @@
     if (!form.name.value.trim()) return L.msg(err, "Please enter your name.");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.value.trim())) return L.msg(err, "Please enter a valid email.");
     if (!form.phone.value.trim()) return L.msg(err, "Please enter your mobile number.");
-    btn.disabled = true; btn.textContent = "Sending…";
+    btn.disabled = true; btn.textContent = "Sending...";
     L.sb.rpc("request_membership", {
       p_name: form.name.value, p_email: form.email.value, p_phone: form.phone.value, p_message: ""
     }).then(function (r) {

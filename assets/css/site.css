@@ -95,7 +95,7 @@ h1, h2, h3, h4, p { margin: 0; }
   padding: 0 var(--gutter);
 }
 .header-nav { display: flex; gap: 28px; }
-.header-nav a { text-decoration: none; font-weight: 400; font-size: 17px; }
+.header-nav a { text-decoration: none; font-weight: 400; font-size: 17px; text-transform: uppercase; }
 .header-nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .logo { position: relative; display: flex; align-items: center; justify-content: center; text-decoration: none; }
 .logo img { height: 58px; width: auto; position: relative; z-index: 1; }
@@ -128,7 +128,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .menu-overlay nav { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 24px; }
 .menu-overlay a {
   font-family: var(--font-display); font-weight: 700; letter-spacing: -0.05em;
-  font-size: clamp(30px, 5vw, 48px); text-decoration: none; line-height: 1.15;
+  font-size: clamp(30px, 5vw, 48px); text-decoration: none; line-height: 1.15; text-transform: uppercase;
 }
 .menu-overlay a:hover, .menu-overlay a.is-current { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 3px; }
 

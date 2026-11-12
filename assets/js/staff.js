@@ -454,7 +454,9 @@
         '<section class="card"><h2 class="card-title">Requests to join (' + reqs.length + ')</h2>' +
         (reqs.length ? reqs.map(function (q) {
           return '<div class="req" data-req="' + q.id + '"><div><b>' + esc(q.full_name) + '</b><div class="muted small">' + esc(q.email) + " · " + esc(q.phone || "") +
-            " · " + L.when(q.created_at) + "</div>" + (q.message ? '<p class="small">&quot;' + esc(q.message) + "&quot;</p>" : "") +
+            " · " + L.when(q.created_at) + "</div>" +
+            '<p class="small"><b>Community role:</b> ' + esc(q.community_role || "Not recorded (older request)") + "</p>" +
+            (q.message ? '<p class="small">&quot;' + esc(q.message) + "&quot;</p>" : "") +
             '</div><div class="req-actions"><label class="small">Extra % <input type="number" min="0" max="100" value="0" data-req-extra></label>' +
             '<button class="btn btn--teal" data-approve>Approve &amp; email passcode</button>' +
             '<input placeholder="Reason (optional, emailed)" data-req-note><button class="btn btn--outline-dark" data-decline>Decline</button></div>' +

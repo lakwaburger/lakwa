@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261106a"  # bump to bust browser caches after changing CSS/JS
+VER = "20261112a"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -305,6 +305,14 @@ Once you're approved, we'll email you a passcode to use at checkout.</p></div>
   <label>Full name<input name="name" required autocomplete="name"></label>
   <label>Email<input name="email" type="email" required autocomplete="email"></label>
   <label>Mobile number<input name="phone" type="tel" required autocomplete="tel" placeholder="09xx xxx xxxx"></label>
+  <label>Which best describes you in the Earth School community?
+    <select name="community_role" required>
+      <option value="">Choose your role</option>
+      <option value="Parent of a student">Parent of a student</option>
+      <option value="Student">Student</option>
+      <option value="Kalye Artisano tenant">Kalye Artisano tenant</option>
+    </select>
+  </label>
   <p class="err" role="alert" data-error hidden></p>
   <button class="btn btn--red btn--block">Request to join</button>
 </form>

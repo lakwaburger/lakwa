@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261124b"  # bump to bust browser caches after changing CSS/JS
+VER = "20261124c"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -311,9 +311,10 @@ Once you're approved, we'll email you a passcode to use at checkout.</p></div>
       <option value="Parent of a student">Parent of a student</option>
       <option value="Student">Student</option>
       <option value="Kalye Artisano tenant">Kalye Artisano tenant</option>
-     <option value="Lio Employee">Lio Employee</option>
+     <option value="Lio Staff">Lio Staff</option>
      <option value="Lio Tenant">Lio Tenant</option>
      <option value="Lakwa Barkada">Lakwa Barkada</option>
+     <option value="HealthWay">HealthWay</option>
     </select>
   </label>
   <p class="err" role="alert" data-error hidden></p>

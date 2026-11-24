@@ -6,7 +6,7 @@ import html, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 E = html.escape
-VER = "20261124a"  # bump to bust browser caches after changing CSS/JS
+VER = "20261124b"  # bump to bust browser caches after changing CSS/JS
 
 # Where the site lives. Own domain (lakwaburger.com, see CNAME) = "" (site root).
 # Was "/lakwa" when served from migquesada.github.io/lakwa/.
@@ -45,7 +45,7 @@ MENU = [
 MARKUP = 0  # mirrors Settings → price increase (only used for the first paint; live prices load from the database)
 
 MAIN_NAV = [
-    ("Home", BASE + "/"), ("Order online", BASE + "/order/"), ("Earth School Community", BASE + "/community/"),
+    ("Home", BASE + "/"), ("Order online", BASE + "/order/"), ("Lio Beach Community", BASE + "/community/"),
     ("My orders", BASE + "/orders/"),
 ]
 TICKER = ["Dine in", "Order ahead", "Ride thru", "Home made brioche", "Lakwanaise on everything", "Lio Estate, El Nido"]
@@ -92,7 +92,7 @@ def header():
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="header-inner">
     <nav class="header-nav header-nav--left" aria-label="Cafe">
-      <a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Earth School Community</a><a href="{BASE}/orders/">My orders</a>
+      <a href="{BASE}/order/">Order</a><a href="{BASE}/community/">Lio Beach Community</a><a href="{BASE}/orders/">My orders</a>
     </nav>
     <a href="{BASE}/" class="logo" aria-label="{E(SITE['name'])}">
       <img src="{SITE['logo']}" alt="{E(SITE['name'])}" onerror="this.remove()">
@@ -169,7 +169,7 @@ def page_home():
     <ul class="menu-grid" data-home-menu>
 {cards}
     </ul>
-    <div class="menu-cta"><a href="{BASE}/order/" class="btn btn--cream">Order online</a><p>Earth School Community member? Your member price is applied at checkout. <a href="{BASE}/community/">Request to join →</a></p></div>
+    <div class="menu-cta"><a href="{BASE}/order/" class="btn btn--cream">Order online</a><p>Lio Beach Community member? Your member price is applied at checkout. <a href="{BASE}/community/">Request to join →</a></p></div>
   </div>
 </section>
 <section class="section section--teal feature">
@@ -195,7 +195,7 @@ def page_home():
 def page_order():
     body = f"""<main id="main" class="page page--cream"><div class="container">
 <div class="page-head"><p class="eyebrow">Order online</p><h1 class="display display--lg">Build your order</h1>
-<p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Earth School Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
+<p class="lede">Pay with GCash, upload your receipt, and we'll have it ready for dine in, pick up or ride thru. Lio Beach Community members: tick the box at checkout to get your member price. Not a member yet? <a href="{BASE}/community/">Request to join</a>.</p></div>
 <div class="order-layout">
   <div class="order-menu-wrap">
     <div class="menu-tools" data-menu-tools hidden>
@@ -208,7 +208,7 @@ def page_order():
     <h2 class="display display--sm">Your order</h2>
     <div data-cart><p class="muted">Your cart is empty. Add something tasty.</p></div>
     <fieldset class="member-box">
-      <label class="check"><input type="checkbox" data-member-toggle> I'm an Earth School Community member</label>
+      <label class="check"><input type="checkbox" data-member-toggle> I'm an Lio Beach Community member</label>
       <div class="member-fields" data-member-fields hidden>
         <input type="email" placeholder="Member email" autocomplete="email" data-m-email>
         <input type="password" inputmode="numeric" placeholder="Passcode" autocomplete="current-password" data-m-pass>
@@ -251,7 +251,7 @@ def page_order_view():
 def page_orders():
     body = """<main id="main" class="page page--cream"><div class="container narrow">
 <div class="page-head"><p class="eyebrow">Order history</p><h1 class="display display--lg">My orders</h1>
-<p class="lede">Earth School Community members: sign in with your email and passcode to see every order. Ordered as a guest? Use the link in your order email.</p></div>
+<p class="lede">Lio Beach Community members: sign in with your email and passcode to see every order. Ordered as a guest? Use the link in your order email.</p></div>
 <div data-history>
 <form class="card fields narrow-form" data-history-form>
   <label>Member email<input name="email" type="email" required autocomplete="email"></label>
@@ -281,7 +281,7 @@ def page_staff():
   <header class="staff-bar">
     <a href="#orders" class="staff-brand">LAKWA <span>Staff</span></a>
     <nav data-staff-nav>
-      <a href="#today">Today</a><a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments <span class="badge" data-pay-badge hidden></span></a><a href="#community">Earth School Community <span class="badge" data-req-badge hidden></span></a>
+      <a href="#today">Today</a><a href="#orders">Orders</a><a href="#board">Board</a><a href="#payments">Payments <span class="badge" data-pay-badge hidden></span></a><a href="#community">Lio Beach Community <span class="badge" data-req-badge hidden></span></a>
       <a href="#menu" data-admin>Menu &amp; prices</a><a href="#settings" data-admin>Settings</a>
       <a href="{BASE}/" target="_blank" rel="noopener">View site ↗</a>
     </nav>
@@ -296,8 +296,8 @@ def page_staff():
 
 def page_community():
     body = f"""<main id="main" class="page page--cream"><div class="container narrow">
-<div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Earth School Community</h1>
-<p class="lede">Members of Earth School Community get a community price. It's reflected in your orders automatically
+<div class="page-head"><p class="eyebrow">Lakwa Burger Cafe</p><h1 class="display display--lg">Lio Beach Community</h1>
+<p class="lede">Members of Lio Beach Community get a community price. It's reflected in your orders automatically
 when you check out with your member email and passcode. Send us your details and our team will review your request.
 Once you're approved, we'll email you a passcode to use at checkout.</p></div>
 <div data-community>
@@ -305,24 +305,26 @@ Once you're approved, we'll email you a passcode to use at checkout.</p></div>
   <label>Full name<input name="name" required autocomplete="name"></label>
   <label>Email<input name="email" type="email" required autocomplete="email"></label>
   <label>Mobile number<input name="phone" type="tel" required autocomplete="tel" placeholder="09xx xxx xxxx"></label>
-  <label>Which best describes you in the Earth School community?
+  <label>Which best describes you in the Lio Beach Community?
     <select name="community_role" required>
       <option value="">Choose your role</option>
       <option value="Parent of a student">Parent of a student</option>
       <option value="Student">Student</option>
       <option value="Kalye Artisano tenant">Kalye Artisano tenant</option>
      <option value="Lio Employee">Lio Employee</option>
+     <option value="Lio Tenant">Lio Tenant</option>
+     <option value="Lakwa Barkada">Lakwa Barkada</option>
     </select>
   </label>
   <p class="err" role="alert" data-error hidden></p>
   <button class="btn btn--red btn--block">Request to join</button>
 </form>
-<p class="muted small">Already a member? Just order and tick "I'm an Earth School Community member" at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
+<p class="muted small">Already a member? Just order and tick "I'm an Lio Beach Community member" at checkout. Lost your passcode? Call or text {SITE['phone']}.</p>
 </div>
 </div></main>
 """
-    page("community/index.html", "Earth School Community | Lakwa Burger Cafe",
-         "Join Earth School Community at the Lakwa Burger Cafe in El Nido and get a community price on your orders.", body, js=("community",))
+    page("community/index.html", "Lio Beach Community | Lakwa Burger Cafe",
+         "Join Lio Beach Community at the Lakwa Burger Cafe in El Nido and get a community price on your orders.", body, js=("community",))
 
 def page_board():
     # The screen at the cashier. Big numbers, no names; staff move orders in /staff/#board.

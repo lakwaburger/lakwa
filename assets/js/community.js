@@ -1,4 +1,4 @@
-/* /community/ — request to join Earth School Community. Staff approve it in the dashboard. */
+/* /community/ — request to join Lio Beach Community. Staff approve it in the dashboard. */
 (function () {
   "use strict";
   var form = L.$("[data-community-form]");
@@ -9,7 +9,7 @@
     if (!form.name.value.trim()) return L.msg(err, "Please enter your name.");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.value.trim())) return L.msg(err, "Please enter a valid email.");
     if (!form.phone.value.trim()) return L.msg(err, "Please enter your mobile number.");
-    if (!form.community_role.value) return L.msg(err, "Please choose your role in the Earth School community.");
+    if (!form.community_role.value) return L.msg(err, "Please choose your role in the Lio Beach Community.");
     btn.disabled = true; btn.textContent = "Sending...";
     L.sb.rpc("request_membership", {
       p_name: form.name.value, p_email: form.email.value, p_phone: form.phone.value, p_message: "", p_community_role: form.community_role.value

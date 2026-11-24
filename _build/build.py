@@ -308,8 +308,8 @@ Once you're approved, we'll email you a passcode to use at checkout.</p></div>
   <label>Which best describes you in the Lio Beach Community?
     <select name="community_role" required>
       <option value="">Choose your role</option>
-      <option value="Parent of a student">Parent of a student</option>
-      <option value="Student">Student</option>
+      <option value="Earth School Parent">Earth School Parent</option>
+      <option value="Earth School Student">Earth School Student</option>
       <option value="Kalye Artisano tenant">Kalye Artisano tenant</option>
      <option value="Lio Staff">Lio Staff</option>
      <option value="Lio Tenant">Lio Tenant</option>
